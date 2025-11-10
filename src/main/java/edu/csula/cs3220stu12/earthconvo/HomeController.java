@@ -29,7 +29,7 @@ public class HomeController {
         }
         String username = (String) session.getAttribute("user");
         model.addAttribute("username", username);
-        return "home";
+        return "homepage";
     }
 
     // Generate joke with chat history

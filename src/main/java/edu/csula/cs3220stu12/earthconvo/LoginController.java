@@ -15,18 +15,21 @@ public class LoginController {
 
     @PostMapping("/login")
     public String login(
-            @RequestParam String username,
+            @RequestParam String email,
             @RequestParam String password,
             HttpSession session,
             Model model) {
 
-        if (("Alice".equals(username) && "ali123".equals(password)) ||
-                ("Bob".equals(username) && "abcd".equals(password))) {
-
-            session.setAttribute("user", username);
+        if ("alice@example.com".equals(email) && "ali123".equals(password)) {
+            session.setAttribute("user", "Alice Johnson");
+            session.setAttribute("userEmail", email);
+            return "redirect:/";
+        } else if ("bob@example.com".equals(email) && "abcd".equals(password)) {
+            session.setAttribute("user", "Bob Smith");
+            session.setAttribute("userEmail", email);
             return "redirect:/";
         } else {
-            model.addAttribute("error", "Invalid username or password");
+            model.addAttribute("error", "Invalid email or password");
             return "login";
         }
     }
