@@ -348,9 +348,7 @@
 
             <!-- AI form -->
             <form class="input-form" action="/ask" method="post">
-                <label>
-                    <input type="text" name="prompt" placeholder="Ask anything" autocomplete="off" required>
-                </label>
+                <input type="text" name="prompt" placeholder="Ask anything" autocomplete="off" required>
                 <button type="submit">➜</button>
             </form>
         </footer>
