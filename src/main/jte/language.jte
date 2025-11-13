@@ -1,6 +1,6 @@
 @param String currentLanguage
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"> //
 <head>
     <meta charset="UTF-8">
     <title>Select Language</title>
