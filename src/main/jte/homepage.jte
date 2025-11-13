@@ -313,12 +313,12 @@
                     ${username != null && !username.isEmpty() ? username.substring(0,1).toUpperCase() : "C"}
                 </div>
                 <div>
-                    <div class="profile-text-main">Title</div>
-                    <div class="profile-text-sub">Description</div>
+                    <div class="profile-text-main">Welcome</div>
+                    <div class="profile-text-sub">${username}</div>
                 </div>
             </div>
 
-            <div class="top-bar-title-right">Title</div>
+            <div class="top-bar-title-right">EarthConvo</div>
         </header>
 
         <!-- CONTENT AREA -->
@@ -348,9 +348,9 @@
 
             <!-- AI form -->
             <form class="input-form" action="/ask" method="post">
-                <input type="text" name="prompt" placeholder="Ask anything" autocomplete="off" required>
-                <button type="button" class="x-btn"
-                        onclick="this.form.prompt.value=''">×</button>
+                <label>
+                    <input type="text" name="prompt" placeholder="Ask anything" autocomplete="off" required>
+                </label>
                 <button type="submit">➜</button>
             </form>
         </footer>
