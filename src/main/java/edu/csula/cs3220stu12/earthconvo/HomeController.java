@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 public class HomeController {
 
@@ -32,9 +34,13 @@ public class HomeController {
             session.setAttribute("language", language);
         }
 
+        // 🔹 history = all saved lessons (AI replies) for this user
+        List<String> history = savedLessons.getLessonsForUser(email);
+
         model.addAttribute("username", email);
         model.addAttribute("question", null);
         model.addAttribute("answer", null);
+        model.addAttribute("history", history);
 
         return "homepage";
     }
@@ -93,15 +99,20 @@ public class HomeController {
                     .call()
                     .content();
 
+            // save this reply as a "lesson" for the user
             savedLessons.savedLessons(email, reply);
 
         } catch (Exception e) {
             reply = "Sorry, I couldn't reach the AI service right now. Please try again later.";
         }
 
+        // get updated history after saving
+        List<String> history = savedLessons.getLessonsForUser(email);
+
         model.addAttribute("username", email);
         model.addAttribute("question", prompt);
         model.addAttribute("answer", reply);
+        model.addAttribute("history", history);
 
         return "homepage";
     }
