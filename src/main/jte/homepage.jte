@@ -1,7 +1,8 @@
 @param String username
 @param String question
 @param String answer
-@param java.util.List<String> history
+@param String userEmail
+@param java.util.List<edu.csula.cs3220stu12.earthconvo.ChatMessage> history
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -310,15 +311,13 @@
             <div class="sidebar-section-title">History</div>
             <div class="sidebar-history">
                 @if(history != null && !history.isEmpty())
-                    @for(String item : history)
-                        <div class="history-item">
-                            ${item}
+                    @for(edu.csula.cs3220stu12.earthconvo.ChatMessage msg : history)
+                        <div class="message ai" style="font-size:12px; margin-bottom:6px;">
+                            <strong>EarthConvo:</strong> ${msg.getAiSummary()}
                         </div>
                     @endfor
                 @else
-                    <div class="history-empty">
-                        No history yet. Ask something to start.
-                    </div>
+                    <p class="placeholder">No history yet. Ask something to start.</p>
                 @endif
             </div>
         </div>
@@ -337,11 +336,11 @@
         <header class="top-bar">
             <div class="profile" onclick="window.location='/profile'">
                 <div class="profile-bubble">
-                    ${username != null && !username.isEmpty() ? username.substring(0,1).toUpperCase() : "C"}
+                    ${userEmail != null && !userEmail.isEmpty() ? userEmail.substring(0,1).toUpperCase() : "C"}
                 </div>
                 <div>
                     <div class="profile-text-main">Welcome</div>
-                    <div class="profile-text-sub">${username}</div>
+                    <div class="profile-text-sub">${userEmail}</div>
                 </div>
             </div>
 

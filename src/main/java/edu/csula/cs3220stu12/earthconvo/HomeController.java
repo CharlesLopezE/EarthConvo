@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -35,9 +36,13 @@ public class HomeController {
         }
 
         // 🔹 history = all saved lessons (AI replies) for this user
-        List<String> history = savedLessons.getLessonsForUser(email);
+        List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
+        if (history == null) {
+            history = new ArrayList<>();
+            session.setAttribute("history", history);
+        }
 
-        model.addAttribute("username", email);
+        model.addAttribute("userEmail", email);
         model.addAttribute("question", null);
         model.addAttribute("answer", null);
         model.addAttribute("history", history);
@@ -62,6 +67,7 @@ public class HomeController {
         }
 
         String reply;
+        String summary;
 
         try {
             // English tutor + translations + pronunciation + bullets + short
@@ -98,16 +104,31 @@ public class HomeController {
                             """.formatted(language, language, language, email, prompt))
                     .call()
                     .content();
+            // Generate a short summary for history
+            summary = chatClient
+                    .prompt()
+                    .user("""
+                        Summarize the following response in 1 sentence, so it can be shown in a chat sidebar:
+                        %s
+                        """.formatted(reply))
+                    .call()
+                    .content();
 
             // save this reply as a "lesson" for the user
             savedLessons.savedLessons(email, reply);
 
         } catch (Exception e) {
             reply = "Sorry, I couldn't reach the AI service right now. Please try again later.";
+            summary = reply;
         }
 
         // get updated history after saving
-        List<String> history = savedLessons.getLessonsForUser(email);
+        List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
+        if (history == null) {
+            history = new ArrayList<>();
+        }
+        history.add(new ChatMessage(prompt, reply, summary));
+        session.setAttribute("history", history);
 
         model.addAttribute("username", email);
         model.addAttribute("question", prompt);
