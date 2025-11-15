@@ -1,6 +1,8 @@
 @param String username
 @param String question
 @param String answer
+@param String userEmail
+@param java.util.List<edu.csula.cs3220stu12.earthconvo.ChatMessage> history
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -293,6 +295,18 @@
             <div class="sidebar-section-title">History</div>
             <div class="sidebar-history">
                 <!-- later: link to /saved-lessons, /saved-vocab, etc. -->
+                @if(history != null && !history.isEmpty())
+                @for(edu.csula.cs3220stu12.earthconvo.ChatMessage msg : history)
+                    <div class="message user" style="font-size:12px; margin-bottom:4px;">
+                        <strong>You:</strong> ${msg.userMessage}
+                    </div>
+                    <div class="message ai" style="font-size:12px; margin-bottom:6px;">
+                        <strong>EarthConvo:</strong> ${msg.getAiSummary()}
+                    </div>
+                    @endfor
+                @else
+                <p class="placeholder">No history yet.</p>
+                @endif
             </div>
         </div>
 
@@ -314,7 +328,7 @@
                 </div>
                 <div>
                     <div class="profile-text-main">Welcome</div>
-                    <div class="profile-text-sub">${username}</div>
+                    <div class="profile-text-sub">${userEmail}</div>
                 </div>
             </div>
 
@@ -349,6 +363,8 @@
             <!-- AI form -->
             <form class="input-form" action="/ask" method="post">
                 <input type="text" name="prompt" placeholder="Ask anything" autocomplete="off" required>
+                <button type="button" class="x-btn"
+                        onclick="this.form.prompt.value=''">×</button>
                 <button type="submit">➜</button>
             </form>
         </footer>
