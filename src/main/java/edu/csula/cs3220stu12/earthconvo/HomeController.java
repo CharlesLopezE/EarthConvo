@@ -8,13 +8,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 public class HomeController {
 
     private final ChatClient chatClient;
     private final SavedLessons savedLessons;
 
-    // Spring will auto-inject ChatClient.Builder from spring-ai starter
     public HomeController(ChatClient.Builder chatClientBuilder, SavedLessons savedLessons) {
         this.chatClient = chatClientBuilder.build();
         this.savedLessons = savedLessons;
@@ -27,18 +29,25 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        // default language if none chosen yet
         String language = (String) session.getAttribute("language");
         if (language == null || language.isEmpty()) {
             language = "English";
             session.setAttribute("language", language);
         }
 
+        // Retrieve chat history from session
+        List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
+        if (history == null) {
+            history = new ArrayList<>();
+            session.setAttribute("history", history);
+        }
+
         model.addAttribute("username", email);
         model.addAttribute("question", null);
         model.addAttribute("answer", null);
+        model.addAttribute("history", history);
 
-        return "homepage"; // homepage.jte
+        return "homepage";
     }
 
     @PostMapping("/ask")
@@ -58,9 +67,8 @@ public class HomeController {
         }
 
         String reply;
-
+        String summary;
         try {
-            // Try to call the AI model
             reply = chatClient
                     .prompt()
                     .user("""
@@ -73,21 +81,38 @@ public class HomeController {
                     .call()
                     .content();
 
-            // Only save if the AI call succeeded
+            // Generate a short summary for history
+            summary = chatClient
+                    .prompt()
+                    .user("""
+                        Summarize the following response in 1 sentence, so it can be shown in a chat sidebar:
+                        %s
+                        """.formatted(reply))
+                    .call()
+                    .content();
+
+            // Save lesson in your SavedLessons system
             savedLessons.savedLessons(email, reply);
 
         } catch (Exception e) {
-            // If the AI call fails (like HTTP 401 User not found),
-            // we stay on the homepage and show a friendly error message.
-            reply = "Sorry, I couldn't reach the AI service right now. "
-                    + "Please try again later.";
+            reply = "Sorry, I couldn't reach the AI service right now. Please try again later.";
+            summary = reply;
         }
 
+        // Store chat history in session
+        List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
+        if (history == null) {
+            history = new ArrayList<>();
+        }
+        history.add(new ChatMessage(prompt, reply, summary));
+        session.setAttribute("history", history);
+
+        // Add data for JTE template
         model.addAttribute("username", email);
         model.addAttribute("question", prompt);
         model.addAttribute("answer", reply);
+        model.addAttribute("history", history);
 
         return "homepage";
     }
 }
-
