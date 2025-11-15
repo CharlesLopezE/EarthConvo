@@ -100,7 +100,7 @@
         }
 
         .history-item {
-            background-color: #3f6fa9;
+            background-color: white;
             border-radius: 6px;
             padding: 6px 8px;
             margin-bottom: 6px;
@@ -340,12 +340,12 @@
                     ${username != null && !username.isEmpty() ? username.substring(0,1).toUpperCase() : "C"}
                 </div>
                 <div>
-                    <div class="profile-text-main">Title</div>
-                    <div class="profile-text-sub">Description</div>
+                    <div class="profile-text-main">Welcome</div>
+                    <div class="profile-text-sub">${username}</div>
                 </div>
             </div>
 
-            <div class="top-bar-title-right">Title</div>
+            <div class="top-bar-title-right">EarthConvo</div>
         </header>
 
         <!-- CONTENT AREA -->
