@@ -1,8 +1,7 @@
 @param String username
 @param String question
 @param String answer
-@param String userEmail
-@param java.util.List<edu.csula.cs3220stu12.earthconvo.ChatMessage> history
+@param java.util.List<String> history
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,7 +95,23 @@
             border: 2px solid #0d2740;
             background-color: #2d67a7;
             padding: 8px;
-            font-size: 14px;
+            font-size: 13px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background-color: #3f6fa9;
+            border-radius: 6px;
+            padding: 6px 8px;
+            margin-bottom: 6px;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-empty {
+            opacity: 0.7;
+            font-size: 13px;
         }
 
         .sidebar-delete {
@@ -270,13 +285,13 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-top-buttons">
-            <button>
+            <button type="button" onclick="window.location='/'">
                 <span>New Chat</span>
                 <span class="icon">✚</span>
             </button>
 
             <div class="sidebar-select-row">
-                <!-- Language button now links to /language -->
+                <!-- Language button links to /language -->
                 <form action="/language" method="get" style="flex: 1; display: inline-flex;">
                     <button type="submit" class="secondary small">
                         <span>Language</span>
@@ -284,7 +299,7 @@
                     </button>
                 </form>
 
-                <button class="secondary small">
+                <button class="secondary small" type="button">
                     <span>Saves</span>
                     <span class="icon">▾</span>
                 </button>
@@ -294,24 +309,22 @@
         <div>
             <div class="sidebar-section-title">History</div>
             <div class="sidebar-history">
-                <!-- later: link to /saved-lessons, /saved-vocab, etc. -->
                 @if(history != null && !history.isEmpty())
-                @for(edu.csula.cs3220stu12.earthconvo.ChatMessage msg : history)
-                    <div class="message user" style="font-size:12px; margin-bottom:4px;">
-                        <strong>You:</strong> ${msg.userMessage}
-                    </div>
-                    <div class="message ai" style="font-size:12px; margin-bottom:6px;">
-                        <strong>EarthConvo:</strong> ${msg.getAiSummary()}
-                    </div>
+                    @for(String item : history)
+                        <div class="history-item">
+                            ${item}
+                        </div>
                     @endfor
                 @else
-                <p class="placeholder">No history yet.</p>
+                    <div class="history-empty">
+                        No history yet. Ask something to start.
+                    </div>
                 @endif
             </div>
         </div>
 
         <div class="sidebar-delete">
-            <button>
+            <button type="button">
                 <span>Delete</span>
             </button>
         </div>
@@ -327,12 +340,12 @@
                     ${username != null && !username.isEmpty() ? username.substring(0,1).toUpperCase() : "C"}
                 </div>
                 <div>
-                    <div class="profile-text-main">Welcome</div>
-                    <div class="profile-text-sub">${userEmail}</div>
+                    <div class="profile-text-main">Title</div>
+                    <div class="profile-text-sub">Description</div>
                 </div>
             </div>
 
-            <div class="top-bar-title-right">EarthConvo</div>
+            <div class="top-bar-title-right">Title</div>
         </header>
 
         <!-- CONTENT AREA -->

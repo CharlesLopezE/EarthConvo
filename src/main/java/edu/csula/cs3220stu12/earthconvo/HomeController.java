@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -35,12 +34,8 @@ public class HomeController {
             session.setAttribute("language", language);
         }
 
-        // Retrieve chat history from session
-        List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
-        if (history == null) {
-            history = new ArrayList<>();
-            session.setAttribute("history", history);
-        }
+        // 🔹 history = all saved lessons (AI replies) for this user
+        List<String> history = savedLessons.getLessonsForUser(email);
 
         model.addAttribute("username", email);
         model.addAttribute("question", null);
@@ -67,47 +62,53 @@ public class HomeController {
         }
 
         String reply;
-        String summary;
+
         try {
+            // English tutor + translations + pronunciation + bullets + short
             reply = chatClient
                     .prompt()
                     .user("""
-                            You are a language tutor called EarthConvo.
-                            The user selected this language for explanations and examples: %s.
-                            Answer primarily in that language, but you can include English as needed to help learning.
-                            User email: %s
-                            User message: %s
-                            """.formatted(language, email, prompt))
+                            You are an English tutor named EarthConvo.
+
+                            Selected translation language: %s
+
+                            Your reply rules:
+                            - Always explain in simple English.
+                            - Keep answers short.
+                            - Use bullet points only.
+                            - Do NOT use bold, italics, Markdown syntax, or numbering.
+                            - Every line must start with "- " (dash + space).
+
+                            Translation rule:
+                            - If the user asks to translate, asks "how do I say", or clearly wants a translation,
+                              your reply must include these bullets IN THIS EXACT ORDER:
+
+                              - Translation (in %s): <translated text in %s>
+                              - Pronunciation: <pronunciation written in English letters>
+                              - Explanation: <simple explanation in English>
+                              - Example: <1 short example sentence in English>
+
+                            If the user is NOT asking for translation:
+                            - Just answer using English bullet points.
+
+                            Keep everything short and clear.
+                            
+                            User: %s
+                            Question: %s
+                            """.formatted(language, language, language, email, prompt))
                     .call()
                     .content();
 
-            // Generate a short summary for history
-            summary = chatClient
-                    .prompt()
-                    .user("""
-                        Summarize the following response in 1 sentence, so it can be shown in a chat sidebar:
-                        %s
-                        """.formatted(reply))
-                    .call()
-                    .content();
-
-            // Save lesson in your SavedLessons system
+            // save this reply as a "lesson" for the user
             savedLessons.savedLessons(email, reply);
 
         } catch (Exception e) {
             reply = "Sorry, I couldn't reach the AI service right now. Please try again later.";
-            summary = reply;
         }
 
-        // Store chat history in session
-        List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
-        if (history == null) {
-            history = new ArrayList<>();
-        }
-        history.add(new ChatMessage(prompt, reply, summary));
-        session.setAttribute("history", history);
+        // get updated history after saving
+        List<String> history = savedLessons.getLessonsForUser(email);
 
-        // Add data for JTE template
         model.addAttribute("username", email);
         model.addAttribute("question", prompt);
         model.addAttribute("answer", reply);
