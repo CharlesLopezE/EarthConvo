@@ -11,7 +11,7 @@ public class SavedLessons {
         return savedLessons.computeIfAbsent(username, k -> new ArrayList<>());
     }
 
-    public void savedLessons(String username, String joke) {
-        getLessonsForUser(username).add(joke);
+    public void savedLessons(String username, String lessons) {
+        getLessonsForUser(username).add(lessons);
     }
 }

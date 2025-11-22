@@ -16,10 +16,14 @@ public class HomeController {
 
     private final ChatClient chatClient;
     private final SavedLessons savedLessons;
+    private final SavedSentences savedSentences;
+    private final SavedVocab savedVocab;
 
-    public HomeController(ChatClient.Builder chatClientBuilder, SavedLessons savedLessons) {
+    public HomeController(ChatClient.Builder chatClientBuilder, SavedLessons savedLessons, SavedSentences savedSentences, SavedVocab savedVocab) {
         this.chatClient = chatClientBuilder.build();
         this.savedLessons = savedLessons;
+        this.savedSentences = savedSentences;
+        this.savedVocab = savedVocab;
     }
 
     @GetMapping("/")
@@ -136,5 +140,52 @@ public class HomeController {
         model.addAttribute("history", history);
 
         return "homepage";
+    }
+    @GetMapping("/saved-lessons")
+    public String savedLessonsPage(HttpSession session, Model model) {
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        // get saved lessons from your component
+        List<String> lessons = savedLessons.getLessonsForUser(email);
+
+        model.addAttribute("lessons", lessons);
+        model.addAttribute("userEmail", email);
+
+        return "saved-lessons";
+    }
+
+    @GetMapping("/saved-sentences")
+    public String savedSentencesPage(HttpSession session, Model model) {
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        // get saved sentences from your component
+        List<String> sentences = savedSentences.getSentencesForUser(email);
+
+        model.addAttribute("sentences", sentences);
+        model.addAttribute("userEmail", email);
+
+        return "saved-sentences";
+    }
+
+    @GetMapping("/saved-vocab")
+    public String savedVocabPage(HttpSession session, Model model) {
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        // get saved vocabulary from your component
+        List<String> vocab = savedVocab.getVocabForUser(email);
+
+        model.addAttribute("vocab", vocab);
+        model.addAttribute("userEmail", email);
+
+        return "saved-vocab";
     }
 }

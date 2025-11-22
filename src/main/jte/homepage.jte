@@ -171,7 +171,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 18px;
-            background-color: #3f6fa9;
+            background-color: blue;
         }
 
         .profile {
@@ -273,7 +273,7 @@
 
         .input-bar {
             padding: 14px 20px;
-            background-color: #3f6fa9;
+            background-color: blue;
             display: flex;
             align-items: center;
             gap: 10px;
