@@ -78,6 +78,36 @@
             font-size: 13px;
         }
 
+        .dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-menu {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            top: 100%;
+            background-color: #1c5ba3;
+            border: 2px solid #0d2740;
+            border-radius: 6px;
+            margin-top: 3px;
+            width: 100%;
+            padding: 12px 0;
+        }
+
+        .dropdown-menu a {
+            padding: 8px 12px;
+            color: #f0f6ff;
+            font-size: 13px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #2a8dff;
+        }
+
         .sidebar-select-row {
             display: flex;
             gap: 8px;
@@ -229,6 +259,17 @@
         }
 
         /* input bar */
+        .typing::after {
+            content: "";
+            animation: dots 1.2s infinite;
+        }
+
+        @keyframes dots {
+            0% { content: ""; }
+            33% { content: "."; }
+            66% { content: ".."; }
+            100% { content: "..."; }
+        }
 
         .input-bar {
             padding: 14px 20px;
@@ -278,6 +319,7 @@
         .input-form .x-btn {
             font-weight: 700;
         }
+
     </style>
 </head>
 <body>
@@ -296,14 +338,19 @@
                 <form action="/language" method="get" style="flex: 1; display: inline-flex;">
                     <button type="submit" class="secondary small">
                         <span>Language</span>
-                        <span class="icon">▾</span>
                     </button>
                 </form>
-
-                <button class="secondary small" type="button">
-                    <span>Saves</span>
-                    <span class="icon">▾</span>
-                </button>
+                <div class="dropdown">
+                    <button class="secondary small" type="button" onclick="toggleDropdown()">
+                        <span>Saves</span>
+                        <span class="icon">▾</span>
+                    </button>
+                    <div id = "saves-menu" class = "dropdown-menu">
+                        <a href = "/saved-lessons">Lessons</a>
+                        <a href = "/saved-sentences">Sentences</a>
+                        <a href = "/saved-vocab">Vocabulary</a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -313,11 +360,11 @@
                 @if(history != null && !history.isEmpty())
                     @for(edu.csula.cs3220stu12.earthconvo.ChatMessage msg : history)
                         <div class="message ai" style="font-size:12px; margin-bottom:6px;">
-                            <strong>EarthConvo:</strong> ${msg.getAiSummary()}
+                            <strong></strong> ${msg.getAiSummary()}
                         </div>
                     @endfor
                 @else
-                    <p class="placeholder">No history yet. Ask something to start.</p>
+                    <p class="placeholder">No history yet.</p>
                 @endif
             </div>
         </div>
@@ -373,7 +420,7 @@
                     onclick="window.location='/'">Clear</button>
 
             <!-- AI form -->
-            <form class="input-form" action="/ask" method="post">
+            <form class="input-form" action="/ask" method="post" onsubmit="showLoading()">
                 <input type="text" name="prompt" placeholder="Ask anything" autocomplete="off" required>
                 <button type="button" class="x-btn"
                         onclick="this.form.prompt.value=''">×</button>
@@ -381,8 +428,25 @@
             </form>
         </footer>
 
+        <script>
+            function showLoading() {
+                const convo = document.querySelector('.conversation');
+                convo.innerHTML = `
+        <div class="message ai">
+            <strong>EarthConvo:</strong> <span class="typing">Typing</span>
+        </div>
+    `;
+            }
+        </script>
+
     </div>
 </div>
+<script>
+    function toggleDropdown() {
+        const menu = document.getElementById("saves-menu");
+        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    }
+</script>
 </body>
 </html>
 
