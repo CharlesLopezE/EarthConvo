@@ -155,6 +155,100 @@
                 border-color: #410425;
             }
 
+            .sidebar-settings {
+                margin-top: auto; /* pushes it to the bottom of sidebar */
+                display: flex;
+                justify-content: flex-start; /* align left instead of center */
+                padding-left: 3px; /* optional: add a little padding from the edge */
+            }
+
+            .sidebar-settings button {
+                width: auto; /* fit content instead of full width */
+                border-radius: 24px;
+                border: 2px solid #0d2740;
+                background-color: #2f7ae0;
+                color: #ffffff;
+                padding: 8px 12px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+            .sidebar-settings button:hover {
+                background-color: #1c5ba3;
+            }
+
+            /* Overlay & Modal */
+            .settings-modal {
+                display: none; /* hidden by default */
+                position: fixed;
+                top: 0; left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .settings-modal.show {
+                display: flex; /* show modal */
+            }
+
+            .settings-overlay {
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                background-color: rgba(0,0,0,0.5); /* dim background */
+            }
+
+            .settings-content {
+                position: relative;
+                background-color: #1e4f94;
+                color: #fff;
+                border-radius: 8px;
+                width: 400px;
+                max-width: 90%;
+                padding: 20px;
+                z-index: 1001;
+                box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            }
+
+            .settings-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-weight: 600;
+                font-size: 18px;
+                margin-bottom: 16px;
+            }
+
+            .settings-body .settings-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                border-bottom: 1px solid rgba(255,255,255,0.3);
+            }
+
+            .settings-body .settings-row:last-child {
+                border-bottom: none;
+            }
+
+            .settings-body button {
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 16px;
+                cursor: pointer;
+            }
+
+            .settings-close {
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 20px;
+                cursor: pointer;
+            }
+
             /* ---------- MAIN AREA ---------- */
 
             .main {
@@ -372,6 +466,38 @@
             <div class="sidebar-delete">
                 <button type="button" onclick="clearHistory()">Delete</button>
             </div>
+
+            <div class="sidebar-settings">
+                <button type="button" onclick="openSettings()">
+                    <i class="bi bi-gear-fill"></i> ⚙ Settings
+                </button>
+            </div>
+
+            <!-- SETTINGS MODAL -->
+            <div id="settings-modal" class="settings-modal">
+                <div class="settings-overlay" onclick="closeSettings()"></div>
+                <div class="settings-content">
+                    <div class="settings-header">
+                        <span>Settings</span>
+                        <button class="settings-close" onclick="closeSettings()">✕</button>
+                    </div>
+                    <div class="settings-body">
+                        <div class="settings-row">
+                            <span>Themes</span>
+                            <button onclick="alert('Themes clicked')">➤</button>
+                        </div>
+                        <div class="settings-row">
+                            <span>Language</span>
+                            <button onclick="alert('Language clicked')">➤</button>
+                        </div>
+                        <div class="settings-row">
+                            <span>About us</span>
+                            <button onclick="alert('About us clicked')">➤</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </aside>
 
         <!-- MAIN AREA -->
@@ -456,6 +582,13 @@
                         Ask EarthConvo anything to start practicing English.
                     </p>
                    `;
+                }
+                function openSettings() {
+                    document.getElementById('settings-modal').classList.add('show');
+                }
+
+                function closeSettings() {
+                    document.getElementById('settings-modal').classList.remove('show');
                 }
             </script>
 

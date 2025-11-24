@@ -191,4 +191,11 @@ public class HomeController {
         model.addAttribute("userEmail", email);
         return "saved-vocab";
     }
+
+    @GetMapping("/settings")
+    public String settings(Model model, HttpSession session) {
+        String userEmail = (String) session.getAttribute("userEmail");
+        model.addAttribute("userEmail", userEmail);
+        return "settings"; // maps to settings.jte
+    }
 }
