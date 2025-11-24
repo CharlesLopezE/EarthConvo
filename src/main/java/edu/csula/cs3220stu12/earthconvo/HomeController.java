@@ -5,8 +5,10 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +21,15 @@ public class HomeController {
     private final SavedSentences savedSentences;
     private final SavedVocab savedVocab;
 
-    public HomeController(ChatClient.Builder chatClientBuilder, SavedLessons savedLessons, SavedSentences savedSentences, SavedVocab savedVocab) {
+    public HomeController(ChatClient.Builder chatClientBuilder, SavedLessons savedLessons,
+                          SavedSentences savedSentences, SavedVocab savedVocab) {
         this.chatClient = chatClientBuilder.build();
         this.savedLessons = savedLessons;
         this.savedSentences = savedSentences;
         this.savedVocab = savedVocab;
     }
 
+    // ------------------ HOME ------------------
     @GetMapping("/")
     public String home(HttpSession session, Model model) {
         String email = (String) session.getAttribute("userEmail");
@@ -54,12 +58,12 @@ public class HomeController {
         return "homepage";
     }
 
+    // ------------------ ASK ------------------
     @PostMapping("/ask")
-    public String ask(
-            @RequestParam("prompt") String prompt,
-            HttpSession session,
-            Model model
-    ) {
+    public String ask(@RequestParam("prompt") String prompt,
+                      HttpSession session,
+                      RedirectAttributes redirectAttributes) {
+
         String email = (String) session.getAttribute("userEmail");
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
@@ -74,7 +78,6 @@ public class HomeController {
         String summary;
 
         try {
-            // English tutor + translations + pronunciation + bullets + short
             reply = chatClient
                     .prompt()
                     .user("""
@@ -102,13 +105,13 @@ public class HomeController {
                             - Just answer using English bullet points.
 
                             Keep everything short and clear.
-                            
+
                             User: %s
                             Question: %s
                             """.formatted(language, language, language, email, prompt))
                     .call()
                     .content();
-            // Generate a short summary for history
+
             summary = chatClient
                     .prompt()
                     .user("""
@@ -118,7 +121,6 @@ public class HomeController {
                     .call()
                     .content();
 
-            // save this reply as a "lesson" for the user
             savedLessons.savedLessons(email, reply);
 
         } catch (Exception e) {
@@ -126,7 +128,7 @@ public class HomeController {
             summary = reply;
         }
 
-        // get updated history after saving
+        // Add to session history
         List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
         if (history == null) {
             history = new ArrayList<>();
@@ -134,13 +136,21 @@ public class HomeController {
         history.add(new ChatMessage(prompt, reply, summary));
         session.setAttribute("history", history);
 
-        model.addAttribute("username", email);
-        model.addAttribute("question", prompt);
-        model.addAttribute("answer", reply);
-        model.addAttribute("history", history);
+        // Flash attributes for main area (Post/Redirect/Get)
+        redirectAttributes.addFlashAttribute("question", prompt);
+        redirectAttributes.addFlashAttribute("answer", reply);
 
-        return "homepage";
+        // Redirect to home page to prevent double submission
+        return "redirect:/";
     }
+    @GetMapping("/new-chat")
+    public String newChat(HttpSession session) {
+        session.removeAttribute("question");
+        session.removeAttribute("answer");
+        return "redirect:/";
+    }
+
+    // ------------------ SAVED LESSONS ------------------
     @GetMapping("/saved-lessons")
     public String savedLessonsPage(HttpSession session, Model model) {
         String email = (String) session.getAttribute("userEmail");
@@ -148,15 +158,13 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        // get saved lessons from your component
         List<String> lessons = savedLessons.getLessonsForUser(email);
-
         model.addAttribute("lessons", lessons);
         model.addAttribute("userEmail", email);
-
         return "saved-lessons";
     }
 
+    // ------------------ SAVED SENTENCES ------------------
     @GetMapping("/saved-sentences")
     public String savedSentencesPage(HttpSession session, Model model) {
         String email = (String) session.getAttribute("userEmail");
@@ -164,15 +172,13 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        // get saved sentences from your component
         List<String> sentences = savedSentences.getSentencesForUser(email);
-
         model.addAttribute("sentences", sentences);
         model.addAttribute("userEmail", email);
-
         return "saved-sentences";
     }
 
+    // ------------------ SAVED VOCAB ------------------
     @GetMapping("/saved-vocab")
     public String savedVocabPage(HttpSession session, Model model) {
         String email = (String) session.getAttribute("userEmail");
@@ -180,12 +186,9 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        // get saved vocabulary from your component
         List<String> vocab = savedVocab.getVocabForUser(email);
-
         model.addAttribute("vocab", vocab);
         model.addAttribute("userEmail", email);
-
         return "saved-vocab";
     }
 }

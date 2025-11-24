@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <title>Saved Sentences</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -73,7 +73,7 @@
 </nav>
 
 <main class="container my-4">
-    <p class="text-muted small mb-3 fw-bold">Description</p>
+    <p class="text-muted small mb-3 fw-bold">Your saved sentences are listed below.</p>
 
     <div class="card shadow-sm">
         <div class="card-body p-0">
@@ -118,10 +118,6 @@
         </div>
 
         <div class="card-footer d-flex justify-content-between align-items-center">
-            <div class="btn-group" role="group" aria-label="Tabs">
-                <button class="btn btn-outline-secondary btn-sm">Menu</button>
-                <button class="btn btn-outline-secondary btn-sm">Tab</button>
-            </div>
             <a class="btn btn-primary btn-sm" href="#" role="button">
                 <i class="bi bi-arrow-right-circle"></i> Go to AI Interaction
             </a>
