@@ -8,6 +8,64 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="lessons.css" rel="stylesheet">
+
+    <style>
+        .lesson-card {
+            background: #111;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            margin-bottom: 16px;
+        }
+
+        .lesson-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .lesson-title {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .lesson-text {
+            color: #a9b6c3;
+            font-size: 14px;
+            line-height: 1.4;
+            max-width: 85%;
+        }
+
+        /* Buttons */
+        .lesson-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-expand {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-expand:hover { background: #5a6268; }
+        .btn-delete:hover { background: #bb2d3b; }
+
+    </style>
 </head>
 <body class="app-shell" style="background-color: lightblue;">
 
@@ -60,18 +118,19 @@
 
     @if(lessons != null && !lessons.isEmpty())
         @for(String lesson : lessons)
-            <div class="panel-dark p-3 mb-3">
-                <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="lesson-card">
+                <div class="lesson-body">
+
                     <div>
-                        <div class="fw-semibold small">Lesson</div>
-                        <div class="small text-secondary">
-                            ${lesson}
-                        </div>
+                        <div class="lesson-title">Lesson</div>
+                        <div class="lesson-text">${lesson}</div>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-secondary btn-sm">Expand</button>
-                        <button class="btn btn-danger btn-sm">Delete</button>
+
+                    <div class="lesson-actions">
+                        <button class="btn-expand">Expand</button>
+                        <button class="btn-delete">Delete</button>
                     </div>
+
                 </div>
             </div>
         @endfor
