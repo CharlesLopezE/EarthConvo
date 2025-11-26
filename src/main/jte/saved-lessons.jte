@@ -125,7 +125,6 @@
                         <div class="lesson-title">Lesson</div>
                         <div class="lesson-text">${lesson}</div>
                     </div>
-
                     <div class="lesson-actions">
                         <button class="btn-expand">Expand</button>
                         <button class="btn-delete">Delete</button>
