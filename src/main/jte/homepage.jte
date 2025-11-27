@@ -68,10 +68,11 @@
 
             body {
                 background-color: #0c1621;
-                min-height: 100vh;
+                height: 100%;
                 display: flex;
                 align-items: stretch;
                 justify-content: center;
+                overflow: hidden;
             }
 
             .app {
@@ -178,6 +179,7 @@
                 padding: 8px;
                 font-size: 13px;
                 overflow-y: auto;
+                max-height: calc(100vh - 300px);
             }
 
             .history-item {
@@ -367,10 +369,12 @@
                 background-color: #97bdee;
                 border-radius: 2px;
                 position: relative;
-                padding: 16px;
+                padding: 10px;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
+                overflow-y: auto;
+                max-height: calc(100vh - 300px);
             }
 
             .conversation {
@@ -544,7 +548,7 @@
                                 @else
                                     <label>
                                         <input type="radio" name="theme" value="default">
-                                        Dark
+                                        Default
                                     </label>
                                 @endif
 
