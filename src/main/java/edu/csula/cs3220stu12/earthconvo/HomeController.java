@@ -43,6 +43,13 @@ public class HomeController {
             session.setAttribute("language", language);
         }
 
+        // ---------- THEME DEFAULT ----------
+        String theme = (String) session.getAttribute("theme");
+        if (theme == null) theme = "default";
+
+        model.addAttribute("theme", theme);
+
+
         // 🔹 history = all saved lessons (AI replies) for this user
         List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
         if (history == null) {
@@ -54,6 +61,7 @@ public class HomeController {
         model.addAttribute("question", null);
         model.addAttribute("answer", null);
         model.addAttribute("history", history);
+        model.addAttribute("theme", theme);
 
         return "homepage";
     }
@@ -165,6 +173,7 @@ public class HomeController {
         List<String> lessons = savedLessons.getLessonsForUser(email);
         model.addAttribute("lessons", lessons);
         model.addAttribute("userEmail", email);
+        model.addAttribute("theme", session.getAttribute("theme"));
         return "saved-lessons";
     }
 
@@ -179,6 +188,7 @@ public class HomeController {
         List<String> sentences = savedSentences.getSentencesForUser(email);
         model.addAttribute("sentences", sentences);
         model.addAttribute("userEmail", email);
+        model.addAttribute("theme", session.getAttribute("theme"));
         return "saved-sentences";
     }
 
@@ -193,6 +203,7 @@ public class HomeController {
         List<String> vocab = savedVocab.getVocabForUser(email);
         model.addAttribute("vocab", vocab);
         model.addAttribute("userEmail", email);
+        model.addAttribute("theme", session.getAttribute("theme"));
         return "saved-vocab";
     }
 
@@ -200,6 +211,7 @@ public class HomeController {
     public String settings(Model model, HttpSession session) {
         String userEmail = (String) session.getAttribute("userEmail");
         model.addAttribute("userEmail", userEmail);
+        model.addAttribute("theme", session.getAttribute("theme"));
         return "settings"; // maps to settings.jte
     }
 }

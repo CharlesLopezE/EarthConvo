@@ -1,6 +1,7 @@
 @param String userEmail
 @param String question
 @param String answer
+@param String theme
 @param java.util.List<edu.csula.cs3220stu12.earthconvo.ChatMessage> history
 
     <!DOCTYPE html>
@@ -15,6 +16,55 @@
                 padding: 0;
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             }
+
+            /* Themes */
+
+            body.dark {
+                background-color: #0c1621;
+                color: #eee;
+            }
+
+            body.light {
+                background-color: #f2f4fb;
+                color: #111;
+            }
+
+            body.light .app { background:#fff }
+            body.light .sidebar { background:#dbe6f7 }
+            body.light .top-bar { background:#cfd9eb }
+            body.light .main { background:white }
+            body.light .content { background:#eef2f8 }
+            body.light .content-box { background:white }
+            body.light .input-bar { background:#cfd9eb }
+            body.light .message.user { background:#cddbf2 }
+            body.light .message.ai { background:#f1f4fb }
+
+            body.dark .app { background:#171616}
+            body.dark .sidebar { background: #0b0909}
+            body.dark .top-bar { background:#171616}
+            body.dark .main { background:black}
+            body.dark .content { background: #292828}
+            body.dark .content-box { background:black}
+            body.dark .input-bar { background:#171616}
+            body.dark .message.user { background: #070606}
+            body.dark .message.ai { background:#171616}
+
+            body.default {
+                background-color: #0c1621;
+                color: black;
+            }
+
+            body.default .app { background:#1e4f94 }
+            body.default .sidebar { background:#2a8dff }
+            body.default .top-bar { background:blue }
+            body.default .main { background:#3f6fa9 }
+            body.default .content { background:lightblue }
+            body.default .content-box { background:#97bdee }
+            body.default .input-bar { background:blue }
+            body.default .message.user { background:#3f6fa9 }
+            body.default .message.ai { background:#d9e6f4 }
+
+
 
             body {
                 background-color: #0c1621;
@@ -248,7 +298,6 @@
                 font-size: 20px;
                 cursor: pointer;
             }
-
             /* ---------- MAIN AREA ---------- */
 
             .main {
@@ -416,7 +465,7 @@
 
         </style>
     </head>
-    <body>
+    <body class="${theme}">
     <div class="app">
 
         <!-- SIDEBAR -->
@@ -483,9 +532,51 @@
                     </div>
                     <div class="settings-body">
                         <div class="settings-row">
-                            <span>Themes</span>
-                            <button onclick="alert('Themes clicked')">➤</button>
+                            <span>Theme ➤</span>
+
+                            <form action="/theme" method="post" style="display:flex; gap:8px;">
+
+                                @if("default".equals(theme))
+                                    <label>
+                                        <input type="radio" name="theme" value="default" checked>
+                                        Default
+                                    </label>
+                                @else
+                                    <label>
+                                        <input type="radio" name="theme" value="default">
+                                        Dark
+                                    </label>
+                                @endif
+
+                                @if("dark".equals(theme))
+                                    <label>
+                                        <input type="radio" name="theme" value="dark" checked>
+                                        Dark
+                                    </label>
+                                @else
+                                    <label>
+                                        <input type="radio" name="theme" value="dark">
+                                        Dark
+                                    </label>
+                                @endif
+
+                                @if("light".equals(theme))
+                                    <label>
+                                        <input type="radio" name="theme" value="light" checked>
+                                        Light
+                                    </label>
+                                @else
+                                    <label>
+                                        <input type="radio" name="theme" value="light">
+                                        Light
+                                    </label>
+                                @endif
+
+                                <button type="submit" style="margin-left:6px; border: 2px solid #ffffff; padding: 6px 12px; justify-content: center;">Save</button>
+
+                            </form>
                         </div>
+
                         <div class="settings-row">
                             <span>Language</span>
                             <button onclick="alert('Language clicked')">➤</button>
