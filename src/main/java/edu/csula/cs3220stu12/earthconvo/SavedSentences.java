@@ -6,6 +6,8 @@ import java.util.*;
 @Component
 public class SavedSentences {
     private final Map<String, List<String>> savedSentences = new HashMap<>();
+    private String original;
+    private String translation;
 
     public List<String> getSentencesForUser(String username) {
         return savedSentences.computeIfAbsent(username, k -> new ArrayList<>());

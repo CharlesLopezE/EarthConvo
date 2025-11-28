@@ -1,3 +1,7 @@
+@param java.util.List<String> vocab
+@param String userEmail
+@param String original
+@param String translation
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,56 +81,38 @@
 
 <!-- 🔹 Page Body -->
 <main class="container my-4">
+    <h1 class="h5 mb-1">Saved Vocabularies</h1>
     <p class="text-muted small mb-3 fw-bold">Your saved vocabularies are listed below.</p>
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table id="vocabTable" class="table table-dark table-striped align-middle mb-0">
-                    <thead>
-                    <tr>
-                        <th class="w-50">English</th>
-                        <th class="w-50 target-lang-header">Spanish</th>
-                        <th class="text-end pe-3">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Hello</td>
-                        <td class="target-lang">Hola</td>
-                        <td class="text-end">
-                            <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Beautiful</td>
-                        <td class="target-lang">Hermosa</td>
-                        <td class="text-end">
-                            <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>School</td>
-                        <td class="target-lang">Escuela</td>
-                        <td class="text-end">
-                            <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-
-                    <!-- placeholder rows -->
-                    <tr>
-                        <td class="text-secondary">—</td><td class="text-secondary">—</td>
-                        <td class="text-end"><button class="btn btn-danger btn-sm" disabled>Delete</button></td>
-                    </tr>
-                    <tr>
-                        <td class="text-secondary">—</td><td class="text-secondary">—</td>
-                        <td class="text-end"><button class="btn btn-danger btn-sm" disabled>Delete</button></td>
-                    </tr>
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    @if(vocab != null && !vocab.isEmpty())
+        @for(String lesson : vocab)
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table id="vocabTable" class="table table-dark table-striped align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="w-50">English</th>
+                                    <th class="w-50 target-lang-header">Spanish</th>
+                                    <th class="text-end pe-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${original}</td>
+                                    <td class="target-lang">${translation}</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        @endfor
+    @else
+        <p class = "vocab-mute">No vocabularies saved yet.</p>
+    @endif
 
         <div class="card-footer d-flex justify-content-between align-items-center">
             <a class="btn btn-primary btn-sm" href="/homepage" role="button">

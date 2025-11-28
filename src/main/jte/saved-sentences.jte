@@ -1,3 +1,7 @@
+@param java.util.List<String> sentences
+@param String userEmail
+@param String original
+@param String translation
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,49 +77,38 @@
 </nav>
 
 <main class="container my-4">
+    <h1 class="h5 mb-1">Saved Sentences</h1>
     <p class="text-muted small mb-3 fw-bold">Your saved sentences are listed below.</p>
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table id="sentencesTable" class="table table-dark table-striped align-middle mb-0">
-                    <thead>
-                    <tr>
-                        <th class="w-50">English</th>
-                        <th class="w-50 target-lang-header">Spanish</th>
-                        <th class="text-end pe-3">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Hello, how are you?</td>
-                        <td class="target-lang">Hola, ¿cómo estás?</td>
-                        <td class="text-end">
-                            <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Where is the train station?</td>
-                        <td class="target-lang">¿Dónde está la estación de tren?</td>
-                        <td class="text-end">
-                            <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Can you help me, please?</td>
-                        <td class="target-lang">¿Puede ayudarme, por favor?</td>
-                        <td class="text-end">
-                            <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="text-secondary">—</td><td class="text-secondary">—</td>
-                        <td class="text-end"><button class="btn btn-danger btn-sm" disabled>Delete</button></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    @if(sentences != null && !sentences.isEmpty())
+        @for(String lesson : sentences)
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table id="sentencesTable" class="table table-dark table-striped align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="w-50">English</th>
+                                    <th class="w-50 target-lang-header">Spanish</th>
+                                    <th class="text-end pe-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>${original}</td>
+                                <td class="target-lang">${translation}</td>
+                                <td class="text-end">
+                                    <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        @endfor
+    @else
+        <p class="text-mute">No sentences saved yet.</p>
+    @endif
 
         <div class="card-footer d-flex justify-content-between align-items-center">
             <a class="btn btn-primary btn-sm" href="#" role="button">

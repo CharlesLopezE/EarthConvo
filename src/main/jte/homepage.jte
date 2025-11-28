@@ -75,6 +75,11 @@
                 overflow: hidden;
             }
 
+            #main, .app, .container {
+                min-height: 95vh;
+            }
+
+
             .app {
                 background-color: #1e4f94;
                 margin: 16px;
