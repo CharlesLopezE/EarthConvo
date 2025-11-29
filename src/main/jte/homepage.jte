@@ -472,6 +472,28 @@
                 font-weight: 700;
             }
 
+            .save-form {
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 6px;
+            }
+
+            .save-btn {
+                border: 2px solid #0d2740;
+                background-color: #2f7ae0;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 999px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .save-btn:hover {
+                background-color: #1c5ba3;
+            }
+
+
         </style>
     </head>
     <body class="${theme}">
@@ -629,6 +651,10 @@
                                 <div class="message ai">
                                     <strong>EarthConvo:</strong> ${msg.getAiResponse()}
                                 </div>
+                                <form action="/save-lesson" method="post" class="save-form">
+                                    <input type="hidden" name="lesson" value="${answer}">
+                                    <button type="submit" class="save-btn">Save Lesson</button>
+                                </form>
                             @endfor
                         @elseif(question != null && answer != null)
                             <div class="message user">
@@ -637,6 +663,7 @@
                             <div class="message ai">
                                 <strong>EarthConvo:</strong> ${answer}
                             </div>
+
                         @else
                             <p class="placeholder">
                                 Ask EarthConvo anything to start practicing English.

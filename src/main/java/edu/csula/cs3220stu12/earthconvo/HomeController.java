@@ -32,7 +32,7 @@ public class HomeController {
     // ------------------ HOME ------------------
     @GetMapping("/")
     public String home(HttpSession session, Model model) {
-        String email = (String) session.getAttribute("userEmail");
+        String email = String.valueOf(session.getAttribute("userEmail"));
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
         }
@@ -72,7 +72,7 @@ public class HomeController {
                       HttpSession session,
                       RedirectAttributes redirectAttributes) {
 
-        String email = (String) session.getAttribute("userEmail");
+        String email = String.valueOf(session.getAttribute("userEmail"));
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
         }
@@ -124,6 +124,7 @@ public class HomeController {
                     .call()
                     .content();
 
+
             summary = chatClient
                     .prompt()
                     .user("""
@@ -133,11 +134,14 @@ public class HomeController {
                     .call()
                     .content();
 
-            savedLessons.savedLessons(email, reply);
-
         } catch (Exception e) {
             reply = "Sorry, I couldn't reach the AI service right now. Please try again later.";
             summary = reply;
+        }
+
+        // Save AI response as lesson
+        if (reply != null && !reply.trim().isEmpty()) {
+            savedLessons.savedLessons(email, reply);
         }
 
         // Add to session history
@@ -165,7 +169,7 @@ public class HomeController {
     // ------------------ SAVED LESSONS ------------------
     @GetMapping("/saved-lessons")
     public String savedLessonsPage(HttpSession session, Model model) {
-        String email = (String) session.getAttribute("userEmail");
+        String email = String.valueOf(session.getAttribute("userEmail"));
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
         }
@@ -177,10 +181,27 @@ public class HomeController {
         return "saved-lessons";
     }
 
+    @PostMapping("/save-lesson")
+    public String saveLesson(@RequestParam("lesson") String lesson,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        savedLessons.savedLessons(email, lesson);
+
+        redirectAttributes.addFlashAttribute("saved", true);
+        return "redirect:/saved-lessons";
+    }
+
+
     // ------------------ SAVED SENTENCES ------------------
     @GetMapping("/saved-sentences")
     public String savedSentencesPage(HttpSession session, Model model) {
-        String email = (String) session.getAttribute("userEmail");
+        String email = String.valueOf(session.getAttribute("userEmail"));
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
         }
@@ -195,7 +216,7 @@ public class HomeController {
     // ------------------ SAVED VOCAB ------------------
     @GetMapping("/saved-vocab")
     public String savedVocabPage(HttpSession session, Model model) {
-        String email = (String) session.getAttribute("userEmail");
+        String email = String.valueOf(session.getAttribute("userEmail"));
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
         }
