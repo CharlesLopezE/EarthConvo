@@ -124,7 +124,7 @@ public class HomeController {
                             - Output 5 separate example sentences.
                             
                             If the user asks for vocabulary:
-                            - Output 5 vocabulary words with short meanings.
+                            - Output 5 vocabulary words.
                             
                             Each item must start with "- "
                             
