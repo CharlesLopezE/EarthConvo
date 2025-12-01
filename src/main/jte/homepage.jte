@@ -485,6 +485,18 @@
                 padding: 6px 12px;
                 border-radius: 999px;
                 font-size: 13px;
+                margin-bottom: 7px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .save-btn2 {
+                border: 2px solid #0d2740;
+                background-color: #d4e5ff;
+                color: #000000;
+                padding: 6px 12px;
+                border-radius: 999px;
+                font-size: 13px;
                 font-weight: 600;
                 cursor: pointer;
             }
@@ -649,8 +661,23 @@
                                     <strong>You:</strong> ${msg.getUserMessage()}
                                 </div>
                                 <div class="message ai">
-                                    <strong>EarthConvo:</strong> ${msg.getAiResponse()}
+                                    <strong>EarthConvo:</strong>
+                                    @if(msg.getAiResponse().startsWith("-"))
+                                        @for(String line : msg.getAiResponse().split("\n"))
+                                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                                                <span>${line}</span>
+
+                                                <form method="post" action="/save-sentence" style="margin:0;">
+                                                    <input type="hidden" name="sentence" value="${line}">
+                                                    @if(msg.type.equals("sentence") || msg.type.equals("vocab"))
+                                                        <button class="save-btn2">Save</button>
+                                                    @endif
+                                                </form>
+                                            </div>
+                                        @endfor
+                                    @endif
                                 </div>
+
                                 <form action="/save-lesson" method="post" class="save-form">
                                     <input type="hidden" name="lesson" value="${answer}">
                                     <button type="submit" class="save-btn">Save Lesson</button>

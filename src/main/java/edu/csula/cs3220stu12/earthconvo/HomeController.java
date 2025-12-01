@@ -85,6 +85,22 @@ public class HomeController {
         String reply;
         String summary;
 
+        boolean wantsSentences =
+                prompt.toLowerCase().contains("sentence") ||
+                        prompt.toLowerCase().contains("example")||
+                        prompt.toLowerCase().contains("oracion");
+
+        boolean wantsVocab =
+                prompt.toLowerCase().contains("vocab") ||
+                        prompt.toLowerCase().contains("vocabulary") ||
+                        prompt.toLowerCase().contains("words");
+
+        String type = "lesson";
+
+        if (wantsSentences) type = "sentence";
+        if (wantsVocab) type = "vocab";
+
+
         try {
             reply = chatClient
                     .prompt()
@@ -103,18 +119,25 @@ public class HomeController {
                             - Use bullet points only.
                             - Do NOT use bold, italics, Markdown syntax, or numbering.
                             - Every line must start with "- " (dash + space).
-
+                            
+                            If the user asks for sentences:
+                            - Output 5 separate example sentences.
+                            
+                            If the user asks for vocabulary:
+                            - Output 5 vocabulary words with short meanings.
+                            
+                            Each item must start with "- "
+                            
                             Translation rule:
                             - If the user asks to translate, asks "how do I say", or clearly wants a translation,
                               your reply must include these bullets IN THIS EXACT ORDER:
 
-                              - Translation (in %s): <translated text in %s>
-                              - Pronunciation: <pronunciation written in English letters>
-                              - Explanation: <simple explanation in English>
-                              - Example: <1 short example sentence in English>
+                              - Translation (in %s): <translated text in %s> Pronunciation: <pronunciation written in English letters> Explanation: <simple explanation in English> Example: <1 short example sentence in English>
+                            
+                            
+                            
 
-                            If the user is NOT asking for translation:
-                            - Just answer using English bullet points.
+                        
 
                             Keep everything short and clear.
 
@@ -149,7 +172,7 @@ public class HomeController {
         if (history == null) {
             history = new ArrayList<>();
         }
-        history.add(new ChatMessage(prompt, reply, summary));
+        history.add(new ChatMessage(prompt, reply, summary, type));
         session.setAttribute("history", history);
 
         // Flash attributes for main area (Post/Redirect/Get)
@@ -213,6 +236,20 @@ public class HomeController {
         return "saved-sentences";
     }
 
+    @PostMapping("/save-sentence")
+    public String saveSentence(@RequestParam("sentence") String sentence,
+                               HttpSession session) {
+
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        savedSentences.savedSentences(email, sentence);
+        return "redirect:/saved-sentences";
+    }
+
+
     // ------------------ SAVED VOCAB ------------------
     @GetMapping("/saved-vocab")
     public String savedVocabPage(HttpSession session, Model model) {
@@ -227,6 +264,20 @@ public class HomeController {
         model.addAttribute("theme", session.getAttribute("theme"));
         return "saved-vocab";
     }
+
+    @PostMapping("/save-vocab")
+    public String saveVocab(@RequestParam("vocab") String vocab,
+                            HttpSession session) {
+
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) {
+            return "redirect:/login";
+        }
+
+        savedVocab.savedVocab(email, vocab);
+        return "redirect:/saved-vocab";
+    }
+
 
     @GetMapping("/settings")
     public String settings(Model model, HttpSession session) {
