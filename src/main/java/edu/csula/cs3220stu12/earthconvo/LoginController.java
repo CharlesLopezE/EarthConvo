@@ -1,5 +1,6 @@
 package edu.csula.cs3220stu12.earthconvo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +14,9 @@ public class LoginController {
         return "login";
     }
 
+    @Autowired
+    private UserStore userStore;
+
     @PostMapping("/login")
     public String login(
             @RequestParam String email,
@@ -20,12 +24,8 @@ public class LoginController {
             HttpSession session,
             Model model) {
 
-        if ("alice@example.com".equals(email) && "ali123".equals(password)) {
-            session.setAttribute("user", "Alice Johnson");
-            session.setAttribute("userEmail", email);
-            return "redirect:/";
-        } else if ("bob@example.com".equals(email) && "abcd".equals(password)) {
-            session.setAttribute("user", "Bob Smith");
+        if (userStore.isValidLogin(email, password)) {
+            session.setAttribute("user", email);
             session.setAttribute("userEmail", email);
             return "redirect:/";
         } else {
