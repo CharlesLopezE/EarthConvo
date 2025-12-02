@@ -95,7 +95,7 @@
                 @if("English".equals(currentLanguage))
                     <input type="radio" name="language" value="English" checked>
                 @else
-                    <input type="radio" name="language" value="English">
+                    <input type="radio" name="language" value="English" required>
                 @endif
                 English
             </label>
@@ -130,7 +130,7 @@
     </form>
 
     <div class="current">
-        Current language: <strong>${currentLanguage}</strong>
+        Current language: <strong>${currentLanguage != null ? currentLanguage : "English"}</strong>
     </div>
 </div>
 </body>

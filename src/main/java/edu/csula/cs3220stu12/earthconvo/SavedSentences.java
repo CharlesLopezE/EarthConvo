@@ -6,14 +6,21 @@ import java.util.*;
 @Component
 public class SavedSentences {
     private final Map<String, List<String>> savedSentences = new HashMap<>();
-    private String original;
-    private String translation;
 
     public List<String> getSentencesForUser(String username) {
         return savedSentences.computeIfAbsent(username, k -> new ArrayList<>());
     }
 
-    public void savedSentences(String username, String sentences) {
-        getSentencesForUser(username).add(sentences);
+    public void savedSentences(String username, String sentence) {
+        if (sentence == null || sentence.trim().isEmpty()) {
+            return;
+        }
+        getSentencesForUser(username).add(sentence);
+    }
+    public void deleteSentence(String userEmail, String sentence) {
+        List<String> list = savedSentences.get(userEmail);
+        if (list != null) {
+            list.remove(sentence);
+        }
     }
 }

@@ -11,13 +11,15 @@ public class ProfileController {
     @GetMapping("/profile")
     public String profile(HttpSession session, Model model) {
         String email = (String) session.getAttribute("userEmail");
+        String username = (String) session.getAttribute("user");
 
-        if (email == null) {
+        if (email == null || email.isEmpty()) {
             return "redirect:/login";
         }
 
         model.addAttribute("email", email);
+        model.addAttribute("username", username);
+
         return "profile";
     }
-    // no /logout here – we use the one in LoginController
 }

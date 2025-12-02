@@ -84,14 +84,16 @@
     <form action="/login" method="post">
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" name="email" required>
+            <input type="email" class="form-control" id="exampleInputEmail1" name="email" inputmode="email" required>
         </div>
         <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">Password</label>
-            <input type="password" class="form-control" id="exampleInputPassword1" name="password" required>
+            <input type="password" class="form-control" id="exampleInputPassword1" name="password" minlength="2" required>
         </div>
         <input type="submit" id="continueButton" value="Continue">
-        <p class="error">${error}</p>
+        @if(error != null)
+            <p class="error">${error}</p>
+        @endif
     </form>
     <div>
         <h5><u>Forgot Password?</u></h5>

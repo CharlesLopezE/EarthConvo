@@ -669,7 +669,7 @@
 
                                                 <form method="post" action="/save-sentence" style="margin:0;">
                                                     <input type="hidden" name="sentence" value="${line}">
-                                                    @if(msg.type.equals("sentence") || msg.type.equals("vocab"))
+                                                    @if(msg.getType().equals("sentence") || msg.getType().equals("vocab"))
                                                         <button class="save-btn2">Save</button>
                                                     @endif
                                                 </form>
@@ -680,7 +680,7 @@
                                 </div>
 
                                 <form action="/save-lesson" method="post" class="save-form">
-                                    <input type="hidden" name="lesson" value="${answer}">
+                                    <input type="hidden" name="lesson" value="${msg.getAiResponse()}">
                                     <button type="submit" class="save-btn">Save Lesson</button>
                                 </form>
                             @endfor

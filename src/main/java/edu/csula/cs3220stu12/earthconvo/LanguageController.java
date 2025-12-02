@@ -20,6 +20,7 @@ public class LanguageController {
         String current = (String) session.getAttribute("language");
         if (current == null || current.isEmpty()) {
             current = "English";
+            session.setAttribute("language", current);
         }
 
         model.addAttribute("currentLanguage", current);
@@ -34,6 +35,10 @@ public class LanguageController {
         String email = (String) session.getAttribute("userEmail");
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
+        }
+
+        if (!language.equals("English") && !language.equals("Spanish") && !language.equals("Japanese")) {
+            return "redirect:/language"; // reject invalid input safely
         }
 
         session.setAttribute("language", language);

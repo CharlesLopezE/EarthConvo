@@ -5,9 +5,9 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
@@ -186,6 +186,7 @@ public class HomeController {
     public String newChat(HttpSession session) {
         session.removeAttribute("question");
         session.removeAttribute("answer");
+        session.removeAttribute("history");
         return "redirect:/";
     }
 
@@ -220,6 +221,15 @@ public class HomeController {
         return "redirect:/saved-lessons";
     }
 
+    @PostMapping("/delete-lesson")
+    public String deleteLesson(@RequestParam String lesson, HttpSession session) {
+        String email = (String) session.getAttribute("userEmail");
+        if (email != null) {
+            savedLessons.getLessonsForUser(email).remove(lesson);
+        }
+        return "redirect:/saved-lessons";
+    }
+
 
     // ------------------ SAVED SENTENCES ------------------
     @GetMapping("/saved-sentences")
@@ -249,6 +259,14 @@ public class HomeController {
         return "redirect:/saved-sentences";
     }
 
+    @PostMapping("/delete-sentence")
+    public String deleteSentence(
+            @RequestParam String userEmail,
+            @RequestParam String sentence
+    ) {
+        savedSentences.deleteSentence(userEmail, sentence);
+        return "redirect:/saved-sentences";
+    }
 
     // ------------------ SAVED VOCAB ------------------
     @GetMapping("/saved-vocab")

@@ -126,8 +126,11 @@
                         <div class="lesson-text">${lesson}</div>
                     </div>
                     <div class="lesson-actions">
-                        <button class="btn-expand">Expand</button>
-                        <button class="btn-delete">Delete</button>
+                        <button type="button" class="btn-expand" onclick="toggleExpand(this)">Expand</button>
+                        <form method="post" action="/delete-lesson" style="margin:0;">
+                            <input type="hidden" name="lesson" value="${lesson}">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
                     </div>
 
                 </div>
@@ -140,5 +143,12 @@
 
 <footer class="py-3 text-center text-muted small">© 2025 AI Language App</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleExpand(btn) {
+        const text = btn.closest('.lesson-card').querySelector('.lesson-text');
+        text.style.whiteSpace = text.style.whiteSpace === 'normal' ? 'nowrap' : 'normal';
+        btn.textContent = btn.textContent === 'Expand' ? 'Collapse' : 'Expand';
+    }
+</script>
 </body>
 </html>

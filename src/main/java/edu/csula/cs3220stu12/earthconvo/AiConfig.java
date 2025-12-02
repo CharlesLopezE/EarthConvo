@@ -9,7 +9,13 @@ public class AiConfig {
 
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder) {
-        // Uses your spring.ai.* properties from application.properties
-        return builder.build();
+        return builder
+                .defaultSystem("""
+                You are EarthConvo, a tutoring AI.
+                Keep responses short and simple.
+                Use bullet points.
+                Avoid markdown formatting.
+                """)
+                .build();
     }
 }
