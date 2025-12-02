@@ -162,11 +162,6 @@ public class HomeController {
             summary = reply;
         }
 
-        // Save AI response as lesson
-        if (reply != null && !reply.trim().isEmpty()) {
-            savedLessons.savedLessons(email, reply);
-        }
-
         // Add to session history
         List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
         if (history == null) {

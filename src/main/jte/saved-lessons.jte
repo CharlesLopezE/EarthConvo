@@ -77,7 +77,7 @@
         </button>
 
         <a class="navbar-brand fw-semibold" href="#">
-            <span class="avatar me-2">C</span>
+            <span class="avatar me-2">${userEmail != null && !userEmail.isEmpty() ? userEmail.substring(0,1).toUpperCase() : "C"}</span>
             EarthConvo
         </a>
 
@@ -139,6 +139,11 @@
     @else
         <p class="text-muted">No lessons saved yet.</p>
     @endif
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <a class="btn btn-primary btn-sm" href="/" role="button">
+            <i class="bi bi-arrow-right-circle"></i> Go to AI Interaction
+        </a>
+    </div>
 </main>
 
 <footer class="py-3 text-center text-muted small">© 2025 AI Language App</footer>

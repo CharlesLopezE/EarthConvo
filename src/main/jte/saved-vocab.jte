@@ -43,7 +43,7 @@
         </button>
 
         <a class="navbar-brand fw-semibold" href="#">
-            <span class="avatar me-2">C</span>
+            <span class="avatar me-2">${userEmail != null && !userEmail.isEmpty() ? userEmail.substring(0,1).toUpperCase() : "C"}</span>
             EarthConvo
         </a>
 
@@ -82,7 +82,7 @@
 <!-- 🔹 Page Body -->
 <main class="container my-4">
     <h1 class="h5 mb-1">Saved Vocabularies</h1>
-    <p class="text-muted small mb-3 fw-bold">Your saved vocabularies are listed below.</p>
+    <p class="text-muted small mb-3">Your saved vocabularies are listed below.</p>
 
     @if(vocab != null && !vocab.isEmpty())
         @for(String lesson : vocab)
@@ -115,7 +115,7 @@
     @endif
 
         <div class="card-footer d-flex justify-content-between align-items-center">
-            <a class="btn btn-primary btn-sm" href="/homepage" role="button">
+            <a class="btn btn-primary btn-sm" href="/" role="button">
                 <i class="bi bi-arrow-right-circle"></i> Go to AI Interaction
             </a>
         </div>
