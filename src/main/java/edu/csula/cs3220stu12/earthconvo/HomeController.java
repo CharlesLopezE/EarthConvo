@@ -151,7 +151,7 @@ public class HomeController {
             summary = chatClient
                     .prompt()
                     .user("""
-                        Summarize the following response in 1 sentence, so it can be shown in a chat sidebar:
+                        Summarize the following response in 3 to 5 words, so it can be shown in a chat sidebar:
                         %s
                         """.formatted(reply))
                     .call()

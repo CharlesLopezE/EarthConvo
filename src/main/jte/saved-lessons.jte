@@ -35,8 +35,33 @@
             color: #a9b6c3;
             font-size: 14px;
             line-height: 1.4;
-            max-width: 85%;
+            max-height: 60px;              /* collapsed height */
+            overflow: hidden;
+            position: relative;
+            transition: max-height 0.4s ease;
         }
+
+        /* fade effect */
+        .lesson-text::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35px;
+            background: linear-gradient(transparent, #111);
+        }
+
+        /* expanded state */
+        .lesson-text.expanded {
+            max-height: 600px;
+        }
+
+        /* hide fade when expanded */
+        .lesson-text.expanded::after {
+            display: none;
+        }
+
 
         /* Buttons */
         .lesson-actions {
@@ -151,8 +176,14 @@
 <script>
     function toggleExpand(btn) {
         const text = btn.closest('.lesson-card').querySelector('.lesson-text');
-        text.style.whiteSpace = text.style.whiteSpace === 'normal' ? 'nowrap' : 'normal';
-        btn.textContent = btn.textContent === 'Expand' ? 'Collapse' : 'Expand';
+
+        if (text.classList.contains("expanded")) {
+            text.classList.remove("expanded");
+            btn.textContent = "Expand";
+        } else {
+            text.classList.add("expanded");
+            btn.textContent = "Collapse";
+        }
     }
 </script>
 </body>
