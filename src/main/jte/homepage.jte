@@ -299,11 +299,13 @@
             }
 
             .settings-close {
-                background: none;
-                border: none;
+                background: #1e4f94;
+                border: 2px solid #0d2740;
                 color: #fff;
                 font-size: 20px;
                 cursor: pointer;
+                position: relative;
+                top: 1px;
             }
             /* ---------- MAIN AREA ---------- */
 
@@ -571,7 +573,9 @@
                 <div class="settings-content">
                     <div class="settings-header">
                         <span>Settings</span>
-                        <button class="settings-close" onclick="closeSettings()">✕</button>
+                        <div>
+                            <button class="settings-close" onclick="closeSettings()">✕</button>
+                        </div>
                     </div>
                     <div class="settings-body">
                         <div class="settings-row">
@@ -618,11 +622,6 @@
                                 <button type="submit" style="margin-left:6px; border: 2px solid #ffffff; padding: 6px 12px; justify-content: center;">Save</button>
 
                             </form>
-                        </div>
-
-                        <div class="settings-row">
-                            <span>Language</span>
-                            <button onclick="alert('Language clicked')">➤</button>
                         </div>
                         <div class="settings-row">
                             <span>About us</span>
