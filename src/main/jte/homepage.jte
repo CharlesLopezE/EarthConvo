@@ -207,9 +207,9 @@
             }
 
             .sidebar-delete button {
-                background-color: #8b1e5d;
+                background-color: #a30707;
                 color: #f8f9ff;
-                border-color: #410425;
+                border-color: #410404;
             }
 
             .sidebar-settings {
