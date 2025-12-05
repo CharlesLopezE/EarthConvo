@@ -546,20 +546,30 @@
             <div class="sidebar-section-title">History</div>
             <div class="sidebar-history">
                 @if(history != null && !history.isEmpty())
-                    @for(edu.csula.cs3220stu12.earthconvo.ChatMessage msg : history)
+                    @for(int i = 0; i < history.size(); i++)
                         <div class="message ai" style="font-size:12px; margin-bottom:6px;">
-                            ${msg.getAiSummary()}
+                            ${history.get(i).getAiSummary()}
+                            <a href="/delete-history?index=${i}" class="btn btn-danger btn-sm" style="font-size:10px; margin-left:4px;">
+                                Delete
+                            </a>
                         </div>
                     @endfor
                 @else
                     <p class="placeholder">No history yet.</p>
                 @endif
+
             </div>
         </div>
 
         <div class="sidebar-delete">
-            <button type="button" onclick="clearHistory()">Delete</button>
+            <button type="button"
+                    onclick="clearHistory()"
+                    class="btn btn-danger"
+                    style="width:100%; padding:10px; font-size:14px;">
+                Delete All History
+            </button>
         </div>
+
 
         <div class="sidebar-settings">
             <button type="button" onclick="openSettings()">
