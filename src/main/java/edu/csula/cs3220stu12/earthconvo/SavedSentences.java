@@ -11,16 +11,45 @@ public class SavedSentences {
         return savedSentences.computeIfAbsent(username, k -> new ArrayList<>());
     }
 
-    public void savedSentences(String username, String sentence) {
-        if (sentence == null || sentence.trim().isEmpty()) {
+    /**
+     * Store a sentence in the format "original||translation".
+     * If the line does not contain a clear separator, the whole line
+     * is stored as the original and the translation is left empty.
+     */
+    public void savedSentences(String username, String sentenceLine) {
+        if (sentenceLine == null || sentenceLine.trim().isEmpty()) {
             return;
         }
-        getSentencesForUser(username).add(sentence);
+        String combined = normalize(sentenceLine);
+        getSentencesForUser(username).add(combined);
     }
-    public void deleteSentence(String userEmail, String sentence) {
+
+    public void deleteSentence(String userEmail, String sentenceEntry) {
         List<String> list = savedSentences.get(userEmail);
         if (list != null) {
-            list.remove(sentence);
+            list.remove(sentenceEntry);
         }
+    }
+
+    private String normalize(String raw) {
+        String s = raw.trim();
+        if (s.startsWith("-")) {
+            s = s.substring(1).trim(); // remove leading "- "
+        }
+
+        String original = s;
+        String translation = "";
+
+        String[] separators = {" -> ", " → ", " — ", " - ", " : ", " = "};
+        for (String sep : separators) {
+            int idx = s.indexOf(sep);
+            if (idx != -1) {
+                original = s.substring(0, idx).trim();
+                translation = s.substring(idx + sep.length()).trim();
+                break;
+            }
+        }
+
+        return original + "||" + translation;
     }
 }

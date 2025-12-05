@@ -17,4 +17,11 @@ public class SavedVocab {
         }
         getVocabForUser(username).add(vocabWord);
     }
+
+    public void deleteVocab(String userEmail, String vocabEntry) {
+        List<String> list = savedVocab.get(userEmail);
+        if (list != null) {
+            list.remove(vocabEntry);
+        }
+    }
 }

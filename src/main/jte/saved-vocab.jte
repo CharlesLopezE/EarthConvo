@@ -1,7 +1,6 @@
 @param java.util.List<String> vocab
 @param String userEmail
-@param String original
-@param String translation
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,8 +17,45 @@
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: rgba(255,255,255,.2);
-            font-weight: 700;
+            font-size: 12px;
+            color: white;
+            background: #0d6efd;
+        }
+
+        .app-shell {
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, #a0c4ff, #1e3a8a);
+        }
+
+        .card {
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-dark {
+            --bs-table-bg: #1f2937;
+            --bs-table-striped-bg: #111827;
+        }
+
+        .target-lang-header {
+            color: #93c5fd;
+        }
+
+        .delete-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .delete-row i {
+            font-size: 14px;
+        }
+
+        .theme-pill {
+            border-radius: 999px;
+            padding: 2px 8px;
+            background: rgba(15,23,42,0.1);
+            font-size: 11px;
         }
 
         @media (max-width: 576px) {
@@ -33,105 +69,104 @@
     </style>
 </head>
 
-<body style="background-color:lightblue">
+<body class="app-shell">
 
-<!-- 🔹 Navbar identical to saved-sentences -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container-fluid">
-        <button class="btn btn-light btn-sm me-2" onclick="history.back()">
-            <i class="bi bi-arrow-left"></i> Return Home
+        <button class="btn btn-light btn-sm me-2" onclick="window.location='/'">
+            <i class="bi bi-arrow-left"></i>
         </button>
 
-        <a class="navbar-brand fw-semibold" href="#">
-            <span class="avatar me-2">${userEmail != null && !userEmail.isEmpty() ? userEmail.substring(0,1).toUpperCase() : "C"}</span>
-            EarthConvo
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <span class="avatar me-2">
+                ${userEmail != null && !userEmail.isEmpty() ? userEmail.substring(0, 1).toUpperCase() : "E"}
+            </span>
+            <span>EarthConvo</span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div id="topbar" class="collapse navbar-collapse">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link active" href="#">Saves</a></li>
-                <li class="nav-item"><a class="nav-link" href="/saved-lessons">Lessons</a></li>
-                <li class="nav-item"><a class="nav-link" href="/saved-sentences">Sentences</a></li>
-                <li class="nav-item"><a class="nav-link" href="/saved-vocab">Vocabulary</a></li>
-            </ul>
-
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge text-bg-dark text-uppercase">Saved Vocabulary</span>
-
-                <div class="btn-group">
-                    <button class="btn btn-outline-light btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-translate me-1"></i> Select Language
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item lang-choice" data-lang="es" href="#">Spanish</a></li>
-                        <li><a class="dropdown-item lang-choice" data-lang="fr" href="#">French</a></li>
-                        <li><a class="dropdown-item lang-choice" data-lang="de" href="#">German</a></li>
-                        <li><a class="dropdown-item lang-choice" data-lang="zh" href="#">Chinese (Simplified)</a></li>
-                    </ul>
-                </div>
-            </div>
+        <div class="ms-auto d-flex align-items-center">
+            <span class="theme-pill text-light me-2">Saved Vocabulary</span>
         </div>
     </div>
 </nav>
 
-
-<!-- 🔹 Page Body -->
 <main class="container my-4">
-    <h1 class="h5 mb-1">Saved Vocabularies</h1>
-    <p class="text-muted small mb-3">Your saved vocabularies are listed below.</p>
+    <h1 class="h5 mb-1">Saved Vocabulary</h1>
+    <p class="text-muted small mb-3">Your saved vocabulary words are listed below.</p>
 
     @if(vocab != null && !vocab.isEmpty())
-        @for(String lesson : vocab)
-            <div class="card shadow-sm">
+        @for(String entry : vocab)
+            <div class="card shadow-sm mb-3">
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table id="vocabTable" class="table table-dark table-striped align-middle mb-0">
                             <thead>
-                                <tr>
-                                    <th class="w-50">English</th>
-                                    <th class="w-50 target-lang-header">Spanish</th>
-                                    <th class="text-end pe-3">Action</th>
-                                </tr>
+                            <tr>
+                                <th class="w-50">English</th>
+                                <th class="w-50 target-lang-header">Spanish</th>
+                                <th class="text-end pe-3">Action</th>
+                            </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>${original}</td>
-                                    <td class="target-lang">${translation}</td>
-                                    <td class="text-end">
-                                        <button class="btn btn-danger btn-sm delete-row"><i class="bi bi-trash"></i> Delete</button>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <!-- ENGLISH column -->
+                                <td>
+                                    ${
+                                            // "book - el libro"
+                                            (entry.contains(" - "))
+                                                ? entry.substring(
+                                                    entry.indexOf(" - ") + 3
+                                                  ).trim()
+                                            // "book -> el libro"
+                                            : (entry.contains(" -> "))
+                                                ? entry.substring(
+                                                    entry.indexOf(" -> ") + 4
+                                                  ).trim()
+                                            // Fallback: Spanish-only vocab → no English
+                                            : ""
+                                        }
+                                </td>
+
+                                <!-- SPANISH column -->
+                                <td class="target-lang">
+                                    ${
+                                            (
+                                                entry.contains(" - ")
+                                                    ? entry.substring(0, entry.indexOf(" - "))
+                                                    : (entry.contains(" -> ")
+                                                        ? entry.substring(0, entry.indexOf(" -> "))
+                                                        : entry
+                                                      )
+                                            ).replaceFirst("^-\\s*", "").trim()
+                                        }
+                                </td>
+
+                                <td class="text-end">
+                                    <form method="post" action="/delete-vocab" style="margin:0;">
+                                        <input type="hidden" name="userEmail" value="${userEmail}">
+                                        <input type="hidden" name="vocab" value="${entry}">
+                                        <button class="btn btn-danger btn-sm delete-row">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
         @endfor
     @else
-        <p class = "vocab-mute">No vocabularies saved yet.</p>
+        <p class="text-mute">No vocabulary saved yet.</p>
     @endif
 
-        <div class="card-footer d-flex justify-content-between align-items-center">
-            <a class="btn btn-primary btn-sm" href="/" role="button">
-                <i class="bi bi-arrow-right-circle"></i> Go to AI Interaction
-            </a>
-        </div>
+    <div class="card-footer d-flex justify-content-between align-items-center mt-3">
+        <a class="btn btn-primary btn-sm" href="/" role="button">
+            <i class="bi bi-arrow-right-circle"></i> Go to AI Interaction
+        </a>
     </div>
 </main>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    document.querySelectorAll('.delete-row').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const row = e.currentTarget.closest('tr');
-            row.remove();
-        });
-    });
-</script>
 
 </body>
 </html>

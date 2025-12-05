@@ -21,8 +21,10 @@ public class HomeController {
     private final SavedSentences savedSentences;
     private final SavedVocab savedVocab;
 
-    public HomeController(ChatClient.Builder chatClientBuilder, SavedLessons savedLessons,
-                          SavedSentences savedSentences, SavedVocab savedVocab) {
+    public HomeController(ChatClient.Builder chatClientBuilder,
+                          SavedLessons savedLessons,
+                          SavedSentences savedSentences,
+                          SavedVocab savedVocab) {
         this.chatClient = chatClientBuilder.build();
         this.savedLessons = savedLessons;
         this.savedSentences = savedSentences;
@@ -37,20 +39,19 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        // language default
         String language = (String) session.getAttribute("language");
         if (language == null || language.isEmpty()) {
             language = "English";
             session.setAttribute("language", language);
         }
 
-        // ---------- THEME DEFAULT ----------
+        // theme default
         String theme = (String) session.getAttribute("theme");
         if (theme == null) theme = "default";
-
         model.addAttribute("theme", theme);
 
-
-        // 🔹 history = all saved lessons (AI replies) for this user
+        // history = chat history in session
         List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
         if (history == null) {
             history = new ArrayList<>();
@@ -61,7 +62,6 @@ public class HomeController {
         model.addAttribute("question", null);
         model.addAttribute("answer", null);
         model.addAttribute("history", history);
-        model.addAttribute("theme", theme);
 
         return "homepage";
     }
@@ -80,15 +80,14 @@ public class HomeController {
         String language = (String) session.getAttribute("language");
         if (language == null || language.isEmpty()) {
             language = "English";
+            session.setAttribute("language", language);
         }
 
-        String reply;
-        String summary;
-
+        // detect what user is asking for
         boolean wantsSentences =
                 prompt.toLowerCase().contains("sentence") ||
-                        prompt.toLowerCase().contains("example")||
-                        prompt.toLowerCase().contains("oracion");
+                        prompt.toLowerCase().contains("sentences") ||
+                        prompt.toLowerCase().contains("oración");
 
         boolean wantsVocab =
                 prompt.toLowerCase().contains("vocab") ||
@@ -96,64 +95,39 @@ public class HomeController {
                         prompt.toLowerCase().contains("words");
 
         String type = "lesson";
-
         if (wantsSentences) type = "sentence";
-        if (wantsVocab) type = "vocab";
+        if (wantsVocab)    type = "vocab";
 
+        String reply;
+        String summary;
 
         try {
+            // Main tutor response
+            String systemPrompt = """
+                    You are an English/Spanish tutor named EarthConvo.
+
+                    Selected translation language: %s
+
+                    Rules:
+                    - Keep answers short.
+                    - Use bullet points (each line starts with "- ").
+                    - No bold, italics, or markdown formatting.
+                    """.formatted(language);
+
             reply = chatClient
                     .prompt()
-                    .user("""
-                            You are an English tutor named EarthConvo.
-
-                            Selected translation language: %s
-                            
-                             Your behavior rules:
-                             - If the selected language is English: reply in simple English.
-                             - If the selected language is Spanish: reply in Spanish.
-                             - If the selected language is Japanese: reply in Japanese.
-
-                            Your reply rules:
-                            - Keep answers short.
-                            - Use bullet points only.
-                            - Do NOT use bold, italics, Markdown syntax, or numbering.
-                            - Every line must start with "- " (dash + space).
-                            
-                            If the user asks for sentences:
-                            - Output 5 separate example sentences.
-                            
-                            If the user asks for vocabulary:
-                            - Output 5 vocabulary words.
-                            
-                            Each item must start with "- "
-                            
-                            Translation rule:
-                            - If the user asks to translate, asks "how do I say", or clearly wants a translation,
-                              your reply must include these bullets IN THIS EXACT ORDER:
-
-                              - Translation (in %s): <translated text in %s> Pronunciation: <pronunciation written in English letters> Explanation: <simple explanation in English> Example: <1 short example sentence in English>
-                            
-                            
-                            
-
-                        
-
-                            Keep everything short and clear.
-
-                            User: %s
-                            Question: %s
-                            """.formatted(language, language, language, email, prompt))
+                    .system(systemPrompt)
+                    .user(prompt)
                     .call()
                     .content();
 
-
+            // Short sidebar summary
             summary = chatClient
                     .prompt()
                     .user("""
-                        Summarize the following response in 3 to 5 words, so it can be shown in a chat sidebar:
-                        %s
-                        """.formatted(reply))
+                            Summarize the following response in 3 to 5 words, so it can be shown in a chat sidebar:
+                            %s
+                            """.formatted(reply))
                     .call()
                     .content();
 
@@ -170,13 +144,15 @@ public class HomeController {
         history.add(new ChatMessage(prompt, reply, summary, type));
         session.setAttribute("history", history);
 
-        // Flash attributes for main area (Post/Redirect/Get)
+        // Flash attributes for main chat display
         redirectAttributes.addFlashAttribute("question", prompt);
         redirectAttributes.addFlashAttribute("answer", reply);
 
-        // Redirect to home page to prevent double submission
+        // Avoid double-submit
         return "redirect:/";
     }
+
+    // ------------------ NEW CHAT (CLEAR HISTORY) ------------------
     @GetMapping("/new-chat")
     public String newChat(HttpSession session) {
         session.removeAttribute("question");
@@ -201,18 +177,11 @@ public class HomeController {
     }
 
     @PostMapping("/save-lesson")
-    public String saveLesson(@RequestParam("lesson") String lesson,
-                             HttpSession session,
-                             RedirectAttributes redirectAttributes) {
-
+    public String saveLesson(@RequestParam("lesson") String lesson, HttpSession session) {
         String email = (String) session.getAttribute("userEmail");
-        if (email == null || email.isEmpty()) {
-            return "redirect:/login";
+        if (email != null && !email.isEmpty()) {
+            savedLessons.savedLessons(email, lesson);
         }
-
-        savedLessons.savedLessons(email, lesson);
-
-        redirectAttributes.addFlashAttribute("saved", true);
         return "redirect:/saved-lessons";
     }
 
@@ -224,7 +193,6 @@ public class HomeController {
         }
         return "redirect:/saved-lessons";
     }
-
 
     // ------------------ SAVED SENTENCES ------------------
     @GetMapping("/saved-sentences")
@@ -291,7 +259,17 @@ public class HomeController {
         return "redirect:/saved-vocab";
     }
 
+    // 🔹 NEW: delete a vocab row (for your delete button in saved-vocab.jte)
+    @PostMapping("/delete-vocab")
+    public String deleteVocab(
+            @RequestParam String userEmail,
+            @RequestParam String vocab
+    ) {
+        savedVocab.deleteVocab(userEmail, vocab);
+        return "redirect:/saved-vocab";
+    }
 
+    // ------------------ SETTINGS ------------------
     @GetMapping("/settings")
     public String settings(Model model, HttpSession session) {
         String userEmail = (String) session.getAttribute("userEmail");
