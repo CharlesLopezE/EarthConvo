@@ -1,4 +1,4 @@
-package edu.csula.cs3220stu12.earthconvo;
+package edu.csula.cs3220stu12.earthconvo.control;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;

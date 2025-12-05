@@ -1,4 +1,4 @@
-package edu.csula.cs3220stu12.earthconvo;
+package edu.csula.cs3220stu12.earthconvo.model;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;

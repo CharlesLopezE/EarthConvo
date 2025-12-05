@@ -1,5 +1,6 @@
-package edu.csula.cs3220stu12.earthconvo;
+package edu.csula.cs3220stu12.earthconvo.control;
 
+import edu.csula.cs3220stu12.earthconvo.model.UserStore;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

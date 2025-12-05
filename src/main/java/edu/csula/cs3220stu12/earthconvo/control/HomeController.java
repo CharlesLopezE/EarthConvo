@@ -1,5 +1,9 @@
-package edu.csula.cs3220stu12.earthconvo;
+package edu.csula.cs3220stu12.earthconvo.control;
 
+import edu.csula.cs3220stu12.earthconvo.ChatMessage;
+import edu.csula.cs3220stu12.earthconvo.model.SavedLessons;
+import edu.csula.cs3220stu12.earthconvo.model.SavedSentences;
+import edu.csula.cs3220stu12.earthconvo.model.SavedVocab;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Controller;
@@ -7,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
