@@ -307,4 +307,29 @@ public class HomeController {
         model.addAttribute("theme", session.getAttribute("theme"));
         return "settings"; // maps to settings.jte
     }
+
+    // ------------------ CLEAR HISTORY (DELETE ALL) ------------------
+    @PostMapping("/clear-history")
+    public String clearHistory(HttpSession session) {
+        session.removeAttribute("history");
+        return "redirect:/";
+    }
+
+    // ------------------ DELETE SINGLE HISTORY ITEM ------------------
+    @GetMapping("/delete-history")
+    public String deleteHistory(
+            @RequestParam("index") int index,
+            HttpSession session
+    ) {
+        List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
+
+        if (history != null && index >= 0 && index < history.size()) {
+            history.remove(index);
+            session.setAttribute("history", history);
+        }
+
+        return "redirect:/";  // go back to homepage or wherever your history UI is
+    }
+
 }
+
