@@ -19,7 +19,7 @@
             border-radius: 50%;
             font-size: 12px;
             color: white;
-            background: #0d6efd;
+            background: #072a7e;
         }
 
         .app-shell {
@@ -84,6 +84,12 @@
             <span>EarthConvo</span>
         </a>
 
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="/saved-lessons">Lessons</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saved-sentences">Sentences</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saved-vocab">Vocabulary</a></li>
+        </ul>
+
         <div class="ms-auto d-flex align-items-center">
             <span class="theme-pill text-light me-2">Saved Vocabulary</span>
         </div>
@@ -112,6 +118,20 @@
                                 <!-- ENGLISH column -->
                                 <td>
                                     ${
+                                            (
+                                                entry.contains(" - ")
+                                                    ? entry.substring(0, entry.indexOf(" - "))
+                                                    : (entry.contains(" -> ")
+                                                        ? entry.substring(0, entry.indexOf(" -> "))
+                                                        : entry
+                                                      )
+                                            ).replaceFirst("^-\\s*", "").trim()
+                                        }
+                                </td>
+
+                                <!-- SPANISH column -->
+                                <td class="target-lang">
+                                    ${
                                             // "book - el libro"
                                             (entry.contains(" - "))
                                                 ? entry.substring(
@@ -124,20 +144,6 @@
                                                   ).trim()
                                             // Fallback: Spanish-only vocab → no English
                                             : ""
-                                        }
-                                </td>
-
-                                <!-- SPANISH column -->
-                                <td class="target-lang">
-                                    ${
-                                            (
-                                                entry.contains(" - ")
-                                                    ? entry.substring(0, entry.indexOf(" - "))
-                                                    : (entry.contains(" -> ")
-                                                        ? entry.substring(0, entry.indexOf(" -> "))
-                                                        : entry
-                                                      )
-                                            ).replaceFirst("^-\\s*", "").trim()
                                         }
                                 </td>
 
@@ -167,6 +173,6 @@
         </a>
     </div>
 </main>
-
+<footer class="py-3 text-center text-muted small">© 2025 AI Language App</footer>
 </body>
 </html>

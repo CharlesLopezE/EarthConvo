@@ -19,7 +19,7 @@
             border-radius: 50%;
             font-size: 12px;
             color: white;
-            background: #0d6efd;
+            background: #072a7e;
         }
 
         .app-shell {
@@ -88,6 +88,12 @@
             <span>EarthConvo</span>
         </a>
 
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="/saved-lessons">Lessons</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saved-sentences">Sentences</a></li>
+            <li class="nav-item"><a class="nav-link" href="/saved-vocab">Vocabulary</a></li>
+        </ul>
+
         <div class="ms-auto d-flex align-items-center">
             <span class="theme-pill text-light me-2">Saved Sentences</span>
         </div>
@@ -117,6 +123,22 @@
                                 <td>
                                     ${
                                             // Case 1: "Buenos días. (Good morning.)"
+
+                                              // Strip leading "- " or "-".
+                                            (
+                                                (lesson.contains("(") && lesson.contains(")"))
+                                                    ? lesson.substring(0, lesson.indexOf("("))
+                                                    : (lesson.contains(" - ")
+                                                        ? lesson.substring(0, lesson.indexOf(" - "))
+                                                        : lesson
+                                                      )
+                                            ).replaceFirst("^-\\s*", "").trim()
+                                        }
+                                </td>
+
+                                <!-- SPANISH column -->
+                                <td class="target-lang">
+                                    ${
                                             (lesson.contains("(") && lesson.contains(")"))
                                                 ? lesson.substring(
                                                     lesson.indexOf("(") + 1,
@@ -130,21 +152,6 @@
                                                 // Fallback: no clear English → empty
                                                 : ""
                                               )
-                                        }
-                                </td>
-
-                                <!-- SPANISH column -->
-                                <td class="target-lang">
-                                    ${
-                                            // Strip leading "- " or "-".
-                                            (
-                                                (lesson.contains("(") && lesson.contains(")"))
-                                                    ? lesson.substring(0, lesson.indexOf("("))
-                                                    : (lesson.contains(" - ")
-                                                        ? lesson.substring(0, lesson.indexOf(" - "))
-                                                        : lesson
-                                                      )
-                                            ).replaceFirst("^-\\s*", "").trim()
                                         }
                                 </td>
 
@@ -174,6 +181,6 @@
         </a>
     </div>
 </main>
-
+<footer class="py-3 text-center text-muted small">© 2025 AI Language App</footer>
 </body>
 </html>

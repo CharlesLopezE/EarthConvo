@@ -50,6 +50,6 @@ public class SavedSentences {
             }
         }
 
-        return original + "||" + translation;
+        return original +  translation;
     }
 }

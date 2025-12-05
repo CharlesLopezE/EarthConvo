@@ -58,7 +58,7 @@
         body.default .sidebar { background:#2a8dff }
         body.default .top-bar { background:blue }
         body.default .main { background:#3f6fa9 }
-        body.default .content { background:lightblue }
+        body.default .content { background: radial-gradient(circle at top left, #a0c4ff, #1e3a8a);}
         body.default .content-box { background:#97bdee }
         body.default .input-bar { background:blue }
         body.default .message.user { background:#3f6fa9 }

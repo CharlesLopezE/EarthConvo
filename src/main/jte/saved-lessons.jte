@@ -90,15 +90,28 @@
         .btn-expand:hover { background: #5a6268; }
         .btn-delete:hover { background: #bb2d3b; }
 
+        body{
+            background: radial-gradient(circle at top left, #a0c4ff, #1e3a8a);
+        }
+        .avatar{
+            display: inline-grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 12px;
+            color: white;
+            background: #072a7e;
+        }
     </style>
 </head>
-<body class="app-shell" style="background-color: lightblue;">
+<body class="app-shell">
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container-fluid">
         <button class="btn btn-light btn-sm me-2" onclick="history.back()">
-            <i class="bi bi-arrow-left"></i> Return Home
+            <i class="bi bi-arrow-left"></i>
         </button>
 
         <a class="navbar-brand fw-semibold" href="#">
