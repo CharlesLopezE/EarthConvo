@@ -1,17 +1,16 @@
 package edu.csula.cs3220stu12.earthconvo.control;
 
 import edu.csula.cs3220stu12.earthconvo.ChatMessage;
-import edu.csula.cs3220stu12.earthconvo.model.SavedLessons;
-import edu.csula.cs3220stu12.earthconvo.model.SavedSentences;
-import edu.csula.cs3220stu12.earthconvo.model.SavedVocab;
+import edu.csula.cs3220stu12.earthconvo.model.*;
+import edu.csula.cs3220stu12.earthconvo.repository.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,24 +19,27 @@ import java.util.List;
 public class HomeController {
 
     private final ChatClient chatClient;
-    private final SavedLessons savedLessons;
-    private final SavedSentences savedSentences;
-    private final SavedVocab savedVocab;
 
-    public HomeController(ChatClient.Builder chatClientBuilder,
-                          SavedLessons savedLessons,
-                          SavedSentences savedSentences,
-                          SavedVocab savedVocab) {
+    @Autowired
+    private UserRepository userRepo;
+
+    @Autowired
+    private LessonRepository lessonRepo;
+
+    @Autowired
+    private SentenceRepository sentenceRepo;
+
+    @Autowired
+    private VocabRepository vocabRepo;
+
+    public HomeController(ChatClient.Builder chatClientBuilder) {
         this.chatClient = chatClientBuilder.build();
-        this.savedLessons = savedLessons;
-        this.savedSentences = savedSentences;
-        this.savedVocab = savedVocab;
     }
 
     // ------------------ HOME ------------------
     @GetMapping("/")
     public String home(HttpSession session, Model model) {
-        String email = String.valueOf(session.getAttribute("userEmail"));
+        String email = (String) session.getAttribute("userEmail");
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
         }
@@ -75,7 +77,7 @@ public class HomeController {
                       HttpSession session,
                       RedirectAttributes redirectAttributes) {
 
-        String email = String.valueOf(session.getAttribute("userEmail"));
+        String email = (String) session.getAttribute("userEmail");
         if (email == null || email.isEmpty()) {
             return "redirect:/login";
         }
@@ -86,7 +88,6 @@ public class HomeController {
             session.setAttribute("language", language);
         }
 
-        // detect what user is asking for
         boolean wantsSentences =
                 prompt.toLowerCase().contains("sentence") ||
                         prompt.toLowerCase().contains("sentences") ||
@@ -99,53 +100,37 @@ public class HomeController {
 
         String type = "lesson";
         if (wantsSentences) type = "sentence";
-        if (wantsVocab)    type = "vocab";
+        if (wantsVocab) type = "vocab";
 
         String reply;
         String summary;
 
         try {
-            // Main tutor response
             String systemPrompt = """
-                            You are an English tutor named EarthConvo.
-
-                            Selected translation language: %s
-                            
-                             Your behavior rules:
-                             - If the selected language is English: reply in simple English.
-                             - If the selected language is Spanish: reply in Spanish.
-                             - If the selected language is Japanese: reply in Japanese.
-
-                            Your reply rules:
-                            - Keep answers short.
-                            - Use bullet points only.
-                            - Do NOT use bold, italics, Markdown syntax, or numbering.
-                            - Every line must start with "- " (dash + space).
-                            
-                            If the user asks for sentences:
-                            - Output 5 separate example sentences.
-                            
-                            If the user asks for vocabulary:
-                            - Output 5 vocabulary words.
-                            
-                            Each item must start with "- "
-                            
-                            Translation rule:
-                            - If the user asks to translate, asks "how do I say", or clearly wants a translation,
-                              your reply must include these bullets IN THIS EXACT ORDER:
-
-                              - Translation (in %s): <translated text in %s> Pronunciation: <pronunciation written in English letters> Explanation: <simple explanation in English> Example: <1 short example sentence in English>
-                            
-                            
-                            
-
-                        
-
-                            Keep everything short and clear.
-
-                            User: %s
-                            Question: %s
-                            """.formatted(language, language, language, email, prompt);
+                    You are an English tutor named EarthConvo.
+                    Selected translation language: %s
+                    Your behavior rules:
+                    - If the selected language is English: reply in simple English.
+                    - If the selected language is Spanish: reply in Spanish.
+                    - If the selected language is Japanese: reply in Japanese.
+                    Your reply rules:
+                    - Keep answers short.
+                    - Use bullet points only.
+                    - Do NOT use bold, italics, Markdown syntax, or numbering.
+                    - Every line must start with "- "
+                    If the user asks for sentences:
+                    - Output 5 separate example sentences.
+                    If the user asks for vocabulary:
+                    - Output 5 vocabulary words.
+                    Each item must start with "- "
+                    Translation rule:
+                    - If the user asks to translate, asks "how do I say", or clearly wants a translation,
+                      your reply must include these bullets IN THIS EXACT ORDER:
+                      - Translation (in %s): <translated text in %s> Pronunciation: <pronunciation written in English letters> Explanation: <simple explanation in English> Example: <1 short example sentence in English>
+                    Keep everything short and clear.
+                    User: %s
+                    Question: %s
+                    """.formatted(language, language, language, email, prompt);
 
             reply = chatClient
                     .prompt()
@@ -154,13 +139,9 @@ public class HomeController {
                     .call()
                     .content();
 
-            // Short sidebar summary
             summary = chatClient
                     .prompt()
-                    .user("""
-                            Summarize the following response in 3 to 5 words, so it can be shown in a chat sidebar:
-                            %s
-                            """.formatted(reply))
+                    .user("Summarize the following response in 3 to 5 words, so it can be shown in a chat sidebar:\n" + reply)
                     .call()
                     .content();
 
@@ -169,23 +150,18 @@ public class HomeController {
             summary = reply;
         }
 
-        // Add to session history
         List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
-        if (history == null) {
-            history = new ArrayList<>();
-        }
+        if (history == null) history = new ArrayList<>();
         history.add(new ChatMessage(prompt, reply, summary, type));
         session.setAttribute("history", history);
 
-        // Flash attributes for main chat display
         redirectAttributes.addFlashAttribute("question", prompt);
         redirectAttributes.addFlashAttribute("answer", reply);
 
-        // Avoid double-submit
         return "redirect:/";
     }
 
-    // ------------------ NEW CHAT (CLEAR HISTORY) ------------------
+    // ------------------ NEW CHAT ------------------
     @GetMapping("/new-chat")
     public String newChat(HttpSession session) {
         session.removeAttribute("question");
@@ -197,12 +173,14 @@ public class HomeController {
     // ------------------ SAVED LESSONS ------------------
     @GetMapping("/saved-lessons")
     public String savedLessonsPage(HttpSession session, Model model) {
-        String email = String.valueOf(session.getAttribute("userEmail"));
-        if (email == null || email.isEmpty()) {
-            return "redirect:/login";
-        }
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) return "redirect:/login";
 
-        List<String> lessons = savedLessons.getLessonsForUser(email);
+        User user = userRepo.findById(email).orElseThrow();
+        List<String> lessons = lessonRepo.findByUser(user).stream()
+                .map(Lesson::getContent)
+                .toList();
+
         model.addAttribute("lessons", lessons);
         model.addAttribute("userEmail", email);
         model.addAttribute("theme", session.getAttribute("theme"));
@@ -212,17 +190,20 @@ public class HomeController {
     @PostMapping("/save-lesson")
     public String saveLesson(@RequestParam("lesson") String lesson, HttpSession session) {
         String email = (String) session.getAttribute("userEmail");
-        if (email != null && !email.isEmpty()) {
-            savedLessons.savedLessons(email, lesson);
+        if (email != null && !lesson.isBlank()) {
+            User user = userRepo.findById(email).orElseThrow();
+            lessonRepo.save(new Lesson(user, lesson));
         }
         return "redirect:/saved-lessons";
     }
 
     @PostMapping("/delete-lesson")
+    @Transactional
     public String deleteLesson(@RequestParam String lesson, HttpSession session) {
         String email = (String) session.getAttribute("userEmail");
         if (email != null) {
-            savedLessons.getLessonsForUser(email).remove(lesson);
+            User user = userRepo.findById(email).orElseThrow();
+            lessonRepo.deleteByUserAndContent(user, lesson);
         }
         return "redirect:/saved-lessons";
     }
@@ -230,12 +211,14 @@ public class HomeController {
     // ------------------ SAVED SENTENCES ------------------
     @GetMapping("/saved-sentences")
     public String savedSentencesPage(HttpSession session, Model model) {
-        String email = String.valueOf(session.getAttribute("userEmail"));
-        if (email == null || email.isEmpty()) {
-            return "redirect:/login";
-        }
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) return "redirect:/login";
 
-        List<String> sentences = savedSentences.getSentencesForUser(email);
+        User user = userRepo.findById(email).orElseThrow();
+        List<String> sentences = sentenceRepo.findByUser(user).stream()
+                .map(Sentence::getSentence)
+                .toList();
+
         model.addAttribute("sentences", sentences);
         model.addAttribute("userEmail", email);
         model.addAttribute("theme", session.getAttribute("theme"));
@@ -243,36 +226,36 @@ public class HomeController {
     }
 
     @PostMapping("/save-sentence")
-    public String saveSentence(@RequestParam("sentence") String sentence,
-                               HttpSession session) {
-
+    public String saveSentence(@RequestParam("sentence") String sentence, HttpSession session) {
         String email = (String) session.getAttribute("userEmail");
-        if (email == null || email.isEmpty()) {
-            return "redirect:/login";
+        if (email != null && !sentence.isBlank()) {
+            User user = userRepo.findById(email).orElseThrow();
+            sentenceRepo.save(new Sentence(user, sentence));
         }
-
-        savedSentences.savedSentences(email, sentence);
         return "redirect:/saved-sentences";
     }
 
     @PostMapping("/delete-sentence")
-    public String deleteSentence(
-            @RequestParam String userEmail,
-            @RequestParam String sentence
-    ) {
-        savedSentences.deleteSentence(userEmail, sentence);
+    public String deleteSentence(@RequestParam String sentence, HttpSession session) {
+        String email = (String) session.getAttribute("userEmail");
+        if (email != null) {
+            User user = userRepo.findById(email).orElseThrow();
+            sentenceRepo.deleteByUserAndSentence(user, sentence);
+        }
         return "redirect:/saved-sentences";
     }
 
     // ------------------ SAVED VOCAB ------------------
     @GetMapping("/saved-vocab")
     public String savedVocabPage(HttpSession session, Model model) {
-        String email = String.valueOf(session.getAttribute("userEmail"));
-        if (email == null || email.isEmpty()) {
-            return "redirect:/login";
-        }
+        String email = (String) session.getAttribute("userEmail");
+        if (email == null || email.isEmpty()) return "redirect:/login";
 
-        List<String> vocab = savedVocab.getVocabForUser(email);
+        User user = userRepo.findById(email).orElseThrow();
+        List<String> vocab = vocabRepo.findByUser(user).stream()
+                .map(Vocab::getEntry)
+                .toList();
+
         model.addAttribute("vocab", vocab);
         model.addAttribute("userEmail", email);
         model.addAttribute("theme", session.getAttribute("theme"));
@@ -280,25 +263,23 @@ public class HomeController {
     }
 
     @PostMapping("/save-vocab")
-    public String saveVocab(@RequestParam("vocab") String vocab,
-                            HttpSession session) {
-
+    public String saveVocab(@RequestParam("vocab") String vocabEntry, HttpSession session) {
         String email = (String) session.getAttribute("userEmail");
-        if (email == null || email.isEmpty()) {
-            return "redirect:/login";
+        if (email != null && !vocabEntry.isBlank()) {
+            User user = userRepo.findById(email).orElseThrow();
+            vocabRepo.save(new Vocab(user, vocabEntry));
         }
-
-        savedVocab.savedVocab(email, vocab);
         return "redirect:/saved-vocab";
     }
 
-    // 🔹 NEW: delete a vocab row (for your delete button in saved-vocab.jte)
     @PostMapping("/delete-vocab")
-    public String deleteVocab(
-            @RequestParam String userEmail,
-            @RequestParam String vocab
-    ) {
-        savedVocab.deleteVocab(userEmail, vocab);
+    @Transactional
+    public String deleteVocab(@RequestParam String vocab, HttpSession session) {
+        String email = (String) session.getAttribute("userEmail");
+        if (email != null) {
+            User user = userRepo.findById(email).orElseThrow();
+            vocabRepo.deleteByUserAndEntry(user, vocab);
+        }
         return "redirect:/saved-vocab";
     }
 
@@ -308,31 +289,24 @@ public class HomeController {
         String userEmail = (String) session.getAttribute("userEmail");
         model.addAttribute("userEmail", userEmail);
         model.addAttribute("theme", session.getAttribute("theme"));
-        return "settings"; // maps to settings.jte
+        return "settings";
     }
 
-    // ------------------ CLEAR HISTORY (DELETE ALL) ------------------
+    // ------------------ HISTORY ------------------
     @PostMapping("/clear-history")
     public String clearHistory(HttpSession session) {
         session.removeAttribute("history");
         return "redirect:/";
     }
 
-    // ------------------ DELETE SINGLE HISTORY ITEM ------------------
     @GetMapping("/delete-history")
-    public String deleteHistory(
-            @RequestParam("index") int index,
-            HttpSession session
-    ) {
+    public String deleteHistory(@RequestParam("index") int index, HttpSession session) {
         List<ChatMessage> history = (List<ChatMessage>) session.getAttribute("history");
-
         if (history != null && index >= 0 && index < history.size()) {
             history.remove(index);
             session.setAttribute("history", history);
         }
-
-        return "redirect:/";  // go back to homepage or wherever your history UI is
+        return "redirect:/";
     }
 
 }
-

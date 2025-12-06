@@ -77,25 +77,32 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container-fluid">
-        <button class="btn btn-light btn-sm me-2" onclick="window.location='/'">
+        <button class="btn btn-light btn-sm me-2" onclick="history.back()">
             <i class="bi bi-arrow-left"></i>
         </button>
 
-        <a class="navbar-brand d-flex align-items-center" href="/">
+        <a class="navbar-brand d-flex align-items-center" href="#">
             <span class="avatar me-2">
                 ${userEmail != null && !userEmail.isEmpty() ? userEmail.substring(0,1).toUpperCase() : "E"}
             </span>
             <span>EarthConvo</span>
         </a>
 
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="/saved-lessons">Lessons</a></li>
-            <li class="nav-item"><a class="nav-link" href="/saved-sentences">Sentences</a></li>
-            <li class="nav-item"><a class="nav-link" href="/saved-vocab">Vocabulary</a></li>
-        </ul>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <div class="ms-auto d-flex align-items-center">
-            <span class="theme-pill text-light me-2">Saved Sentences</span>
+        <div id="topbar" class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="#">Saves</a></li>
+                <li class="nav-item"><a class="nav-link" href="/saved-lessons">Lessons</a></li>
+                <li class="nav-item"><a class="nav-link" href="/saved-sentences">Sentences</a></li>
+                <li class="nav-item"><a class="nav-link" href="/saved-vocab">Vocabulary</a></li>
+            </ul>
+
+            <div class="ms-auto d-flex align-items-center">
+                <span class="theme-pill text-light me-2">Saved Sentences</span>
+            </div>
         </div>
     </div>
 </nav>
@@ -182,5 +189,19 @@
     </div>
 </main>
 <footer class="py-3 text-center text-muted small">© 2025 AI Language App</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleExpand(btn) {
+        const text = btn.closest('.lesson-card').querySelector('.lesson-text');
+
+        if (text.classList.contains("expanded")) {
+            text.classList.remove("expanded");
+            btn.textContent = "Expand";
+        } else {
+            text.classList.add("expanded");
+            btn.textContent = "Collapse";
+        }
+    }
+</script>
 </body>
 </html>

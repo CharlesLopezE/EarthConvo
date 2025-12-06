@@ -7,8 +7,6 @@
     <title>Saved Lessons</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="lessons.css" rel="stylesheet">
-
     <style>
         .lesson-card {
             background: #111;
@@ -35,13 +33,12 @@
             color: #a9b6c3;
             font-size: 14px;
             line-height: 1.4;
-            max-height: 60px;              /* collapsed height */
+            max-height: 60px;
             overflow: hidden;
             position: relative;
             transition: max-height 0.4s ease;
         }
 
-        /* fade effect */
         .lesson-text::after {
             content: "";
             position: absolute;
@@ -52,18 +49,14 @@
             background: linear-gradient(transparent, #111);
         }
 
-        /* expanded state */
         .lesson-text.expanded {
             max-height: 600px;
         }
 
-        /* hide fade when expanded */
         .lesson-text.expanded::after {
             display: none;
         }
 
-
-        /* Buttons */
         .lesson-actions {
             display: flex;
             gap: 8px;
@@ -90,10 +83,11 @@
         .btn-expand:hover { background: #5a6268; }
         .btn-delete:hover { background: #bb2d3b; }
 
-        body{
+        body {
             background: radial-gradient(circle at top left, #a0c4ff, #1e3a8a);
         }
-        .avatar{
+
+        .avatar {
             display: inline-grid;
             place-items: center;
             width: 28px;
@@ -102,6 +96,13 @@
             font-size: 12px;
             color: white;
             background: #072a7e;
+        }
+
+        .theme-pill {
+            border-radius: 999px;
+            padding: 2px 8px;
+            background: rgba(15,23,42,0.1);
+            font-size: 11px;
         }
     </style>
 </head>
@@ -114,9 +115,11 @@
             <i class="bi bi-arrow-left"></i>
         </button>
 
-        <a class="navbar-brand fw-semibold" href="#">
-            <span class="avatar me-2">${userEmail != null && !userEmail.isEmpty() ? userEmail.substring(0,1).toUpperCase() : "C"}</span>
-            EarthConvo
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <span class="avatar me-2">
+                ${userEmail != null && !userEmail.isEmpty() ? userEmail.substring(0,1).toUpperCase() : "E"}
+            </span>
+            <span>EarthConvo</span>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topbar">
@@ -131,20 +134,8 @@
                 <li class="nav-item"><a class="nav-link" href="/saved-vocab">Vocabulary</a></li>
             </ul>
 
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge text-bg-dark text-uppercase">Saved Lessons</span>
-
-                <div class="btn-group">
-                    <button class="btn btn-outline-light btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-translate me-1"></i> Select Language
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item lang-choice" data-lang="es" href="#">Spanish</a></li>
-                        <li><a class="dropdown-item lang-choice" data-lang="fr" href="#">French</a></li>
-                        <li><a class="dropdown-item lang-choice" data-lang="de" href="#">German</a></li>
-                        <li><a class="dropdown-item lang-choice" data-lang="zh" href="#">Chinese (Simplified)</a></li>
-                    </ul>
-                </div>
+            <div class="ms-auto d-flex align-items-center">
+                <span class="theme-pill text-light me-2">Saved Lessons</span>
             </div>
         </div>
     </div>
@@ -158,7 +149,6 @@
         @for(String lesson : lessons)
             <div class="lesson-card">
                 <div class="lesson-body">
-
                     <div>
                         <div class="lesson-title">Lesson</div>
                         <div class="lesson-text">${lesson}</div>
@@ -167,16 +157,17 @@
                         <button type="button" class="btn-expand" onclick="toggleExpand(this)">Expand</button>
                         <form method="post" action="/delete-lesson" style="margin:0;">
                             <input type="hidden" name="lesson" value="${lesson}">
+                            <input type="hidden" name="userEmail" value="${userEmail}">
                             <button type="submit" class="btn-delete">Delete</button>
                         </form>
                     </div>
-
                 </div>
             </div>
         @endfor
     @else
         <p class="text-muted">No lessons saved yet.</p>
     @endif
+
     <div class="card-footer d-flex justify-content-between align-items-center">
         <a class="btn btn-primary btn-sm" href="/" role="button">
             <i class="bi bi-arrow-right-circle"></i> Go to AI Interaction
@@ -189,7 +180,6 @@
 <script>
     function toggleExpand(btn) {
         const text = btn.closest('.lesson-card').querySelector('.lesson-text');
-
         if (text.classList.contains("expanded")) {
             text.classList.remove("expanded");
             btn.textContent = "Expand";
