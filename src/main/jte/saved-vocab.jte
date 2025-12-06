@@ -1,5 +1,6 @@
 @param java.util.List<String> vocab
 @param String userEmail
+@param String language
 
 <!DOCTYPE html>
 <html lang="en">
@@ -115,43 +116,73 @@
                         <table id="vocabTable" class="table table-dark table-striped align-middle mb-0">
                             <thead>
                             <tr>
-                                <th class="w-50">English</th>
-                                <th class="w-50 target-lang-header">Spanish</th>
+                                <th>English</th>
+                                <th class="target-lang-header">${language}</th>
+                                <th>Pronunciation</th>
                                 <th class="text-end pe-3">Action</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <!-- ENGLISH column -->
+                                <!-- ENGLISH column (from [...] if present, else from " - " / " -> ") -->
                                 <td>
                                     ${
-                                            (
-                                                entry.contains(" - ")
-                                                    ? entry.substring(0, entry.indexOf(" - "))
-                                                    : (entry.contains(" -> ")
-                                                        ? entry.substring(0, entry.indexOf(" -> "))
-                                                        : entry
-                                                      )
-                                            ).replaceFirst("^-\\s*", "").trim()
-                                        }
+                                        entry.contains("[") && entry.contains("]")
+                                            // New format: palabra (pah-lah-brah) [word]
+                                            ? entry.substring(
+                                                entry.indexOf("[") + 1,
+                                                entry.lastIndexOf("]")
+                                              ).trim()
+                                            // Older formats: "book - el libro" / "book -> el libro"
+                                            : (
+                                                (
+                                                    entry.contains(" - ")
+                                                        ? entry.substring(0, entry.indexOf(" - "))
+                                                        : (entry.contains(" -> ")
+                                                            ? entry.substring(0, entry.indexOf(" -> "))
+                                                            : entry
+                                                          )
+                                                ).replaceFirst("^-\\s*", "").trim()
+                                              )
+                                    }
                                 </td>
 
-                                <!-- SPANISH column -->
+                                <!-- TARGET LANGUAGE column (before "(" or "[" or " - " / " -> ") -->
                                 <td class="target-lang">
                                     ${
-                                            // "book - el libro"
-                                            (entry.contains(" - "))
-                                                ? entry.substring(
-                                                    entry.indexOf(" - ") + 3
-                                                  ).trim()
-                                            // "book -> el libro"
-                                            : (entry.contains(" -> "))
-                                                ? entry.substring(
-                                                    entry.indexOf(" -> ") + 4
-                                                  ).trim()
-                                            // Fallback: Spanish-only vocab → no English
+                                        entry.contains("(")
+                                            ? entry.substring(0, entry.indexOf("("))
+                                                .replaceFirst("^-\\s*", "")
+                                                .trim()
+                                        : (entry.contains("[")
+                                            ? entry.substring(0, entry.indexOf("["))
+                                                .replaceFirst("^-\\s*", "")
+                                                .trim()
+                                            : (entry.contains(" - ")
+                                                ? entry.substring(0, entry.indexOf(" - "))
+                                                    .replaceFirst("^-\\s*", "")
+                                                    .trim()
+                                                : (entry.contains(" -> ")
+                                                    ? entry.substring(0, entry.indexOf(" -> "))
+                                                        .replaceFirst("^-\\s*", "")
+                                                        .trim()
+                                                    : entry.replaceFirst("^-\\s*", "").trim()
+                                                  )
+                                              )
+                                          )
+                                    }
+                                </td>
+
+                                <!-- PRONUNCIATION column (inside parentheses) -->
+                                <td>
+                                    ${
+                                        (entry.contains("(") && entry.contains(")"))
+                                            ? entry.substring(
+                                                entry.indexOf("(") + 1,
+                                                entry.indexOf(")")
+                                              ).trim()
                                             : ""
-                                        }
+                                    }
                                 </td>
 
                                 <td class="text-end">
@@ -186,10 +217,10 @@
     function toggleExpand(btn) {
         const text = btn.closest('.lesson-card').querySelector('.lesson-text');
 
-        if (text.classList.contains("expanded")) {
+        if (text && text.classList.contains("expanded")) {
             text.classList.remove("expanded");
             btn.textContent = "Expand";
-        } else {
+        } else if (text) {
             text.classList.add("expanded");
             btn.textContent = "Collapse";
         }

@@ -1,5 +1,6 @@
 @param java.util.List<String> sentences
 @param String userEmail
+@param String language
 
 <!DOCTYPE html>
 <html lang="en">
@@ -119,47 +120,71 @@
                         <table id="sentencesTable" class="table table-dark table-striped align-middle mb-0">
                             <thead>
                             <tr>
-                                <th class="w-50">English</th>
-                                <th class="w-50 target-lang-header">Spanish</th>
+                                <th>English</th>
+                                <th class="target-lang-header">${language}</th>
+                                <th>Pronunciation</th>
                                 <th class="text-end pe-3">Action</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr>
-                                <!-- ENGLISH column -->
+                                <!-- ENGLISH column (from [...] if present, fallback to older formats) -->
                                 <td>
                                     ${
-                                            // Case 1: "Buenos días. (Good morning.)"
-
-                                              // Strip leading "- " or "-".
-                                            (
-                                                (lesson.contains("(") && lesson.contains(")"))
-                                                    ? lesson.substring(0, lesson.indexOf("("))
-                                                    : (lesson.contains(" - ")
-                                                        ? lesson.substring(0, lesson.indexOf(" - "))
-                                                        : lesson
-                                                      )
-                                            ).replaceFirst("^-\\s*", "").trim()
-                                        }
+                                        lesson.contains("[") && lesson.contains("]")
+                                            // New format: sentence (pronun) [English]
+                                            ? lesson.substring(
+                                                lesson.indexOf("[") + 1,
+                                                lesson.lastIndexOf("]")
+                                              ).trim()
+                                            // Fallback for older formats
+                                            : (
+                                                (
+                                                    (lesson.contains("(") && lesson.contains(")"))
+                                                        ? lesson.substring(
+                                                            lesson.indexOf("(") + 1,
+                                                            lesson.lastIndexOf(")")
+                                                          )
+                                                        : (lesson.contains(" - ")
+                                                            ? lesson.substring(lesson.indexOf(" - ") + 3)
+                                                            : lesson
+                                                          )
+                                                ).replaceFirst("^-\\s*", "").trim()
+                                              )
+                                    }
                                 </td>
 
-                                <!-- SPANISH column -->
+                                <!-- TARGET LANGUAGE column (before "(" or "[" or " - ") -->
                                 <td class="target-lang">
                                     ${
-                                            (lesson.contains("(") && lesson.contains(")"))
-                                                ? lesson.substring(
-                                                    lesson.indexOf("(") + 1,
-                                                    lesson.lastIndexOf(")")
-                                                  ).trim()
-                                            // Case 2: "Buenos días. - Good morning."
+                                        lesson.contains("(")
+                                            ? lesson.substring(0, lesson.indexOf("("))
+                                                .replaceFirst("^-\\s*", "")
+                                                .trim()
+                                        : (lesson.contains("[")
+                                            ? lesson.substring(0, lesson.indexOf("["))
+                                                .replaceFirst("^-\\s*", "")
+                                                .trim()
                                             : (lesson.contains(" - ")
-                                                ? lesson.substring(
-                                                    lesson.indexOf(" - ") + 3
-                                                  ).trim()
-                                                // Fallback: no clear English → empty
-                                                : ""
+                                                ? lesson.substring(0, lesson.indexOf(" - "))
+                                                    .replaceFirst("^-\\s*", "")
+                                                    .trim()
+                                                : lesson.replaceFirst("^-\\s*", "").trim()
                                               )
-                                        }
+                                          )
+                                    }
+                                </td>
+
+                                <!-- PRONUNCIATION column (inside parentheses) -->
+                                <td>
+                                    ${
+                                        (lesson.contains("(") && lesson.contains(")"))
+                                            ? lesson.substring(
+                                                lesson.indexOf("(") + 1,
+                                                lesson.indexOf(")")
+                                              ).trim()
+                                            : ""
+                                    }
                                 </td>
 
                                 <td class="text-end">
@@ -194,10 +219,10 @@
     function toggleExpand(btn) {
         const text = btn.closest('.lesson-card').querySelector('.lesson-text');
 
-        if (text.classList.contains("expanded")) {
+        if (text && text.classList.contains("expanded")) {
             text.classList.remove("expanded");
             btn.textContent = "Expand";
-        } else {
+        } else if (text) {
             text.classList.add("expanded");
             btn.textContent = "Collapse";
         }
