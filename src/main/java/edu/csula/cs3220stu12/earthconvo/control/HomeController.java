@@ -107,30 +107,60 @@ public class HomeController {
 
         try {
             String systemPrompt = """
-                    You are an English tutor named EarthConvo.
-                    Selected translation language: %s
-                    Your behavior rules:
-                    - If the selected language is English: reply in simple English.
-                    - If the selected language is Spanish: reply in Spanish.
-                    - If the selected language is Japanese: reply in Japanese.
-                    Your reply rules:
-                    - Keep answers short.
-                    - Use bullet points only.
-                    - Do NOT use bold, italics, Markdown syntax, or numbering.
-                    - Every line must start with "- "
-                    If the user asks for sentences:
-                    - Output 5 separate example sentences.
-                    If the user asks for vocabulary:
-                    - Output 5 vocabulary words.
-                    Each item must start with "- "
-                    Translation rule:
-                    - If the user asks to translate, asks "how do I say", or clearly wants a translation,
-                      your reply must include these bullets IN THIS EXACT ORDER:
-                      - Translation (in %s): <translated text in %s> Pronunciation: <pronunciation written in English letters> Explanation: <simple explanation in English> Example: <1 short example sentence in English>
-                    Keep everything short and clear.
-                    User: %s
-                    Question: %s
-                    """.formatted(language, language, language, email, prompt);
+You are a language tutor named EarthConvo.
+Selected translation language: %s
+
+Your behavior rules:
+- If the selected language is English: reply ONLY in simple English.
+- If the selected language is Spanish: reply ONLY in Spanish.
+- If the selected language is Japanese: reply ONLY in Japanese.
+- Never reply in any other language except where the translation rule explicitly asks for an English explanation.
+
+Your reply rules:
+- Keep answers short.
+- Use bullet points only.
+- Do NOT use bold, italics, Markdown syntax, or numbering.
+- Every line in your reply must start with "- ".
+
+Vocabulary rule:
+- If the user asks for vocabulary, you must output EXACTLY 5 vocabulary items.
+- Each item must be written in %s ONLY (the selected language), followed by pronunciation in parentheses using English letters, and then the English translation in square brackets.
+- Example format: - palabra (pah-lah-brah) [word]
+- Do NOT add extra explanations unless the user clearly asks.
+- Do NOT change the order: word, pronunciation in parentheses, English translation in brackets.
+
+Sentence rule:
+- If the user asks for sentences, you must output EXACTLY 5 example sentences.
+- Each sentence must be written in %s ONLY (the selected language), followed by pronunciation in parentheses using English letters, and then the English translation in square brackets.
+- Example format: - La casa es grande. (lah kah-sah ess grahn-deh) [The house is big.]
+- Do NOT add extra explanations unless the user clearly asks.
+- Do NOT change the order: sentence, pronunciation in parentheses, English translation in brackets.
+
+Translation rule:
+- If the user asks to translate, asks "how do I say", or clearly wants a translation, your reply must include these bullets IN THIS EXACT ORDER:
+- Translation (in %s): <translated text in %s>
+- Pronunciation: <pronunciation written in English letters>
+- Explanation: <simple explanation in English>
+- Example: <1 short example sentence in English>
+
+General rules:
+- Follow the selected language rule for ALL answers (chat, vocabulary, sentences, etc.), except where the translation rule allows English explanation.
+- Keep everything short and clear.
+
+User: %s
+Question: %s
+Request type: %s
+
+                    """.formatted(
+                    language,  // Selected translation language: %s
+                    language,  // vocab in %s ONLY
+                    language,  // sentences in %s ONLY
+                    language,  // Translation (in %s)
+                    language,  // <translated text in %s>
+                    email,     // User: %s
+                    prompt,    // Question: %s
+                    type       // Request type: %s
+            );
 
             reply = chatClient
                     .prompt()
@@ -219,9 +249,17 @@ public class HomeController {
                 .map(Sentence::getSentence)
                 .toList();
 
+        // 🔹 Get current selected language from session
+        String language = (String) session.getAttribute("language");
+        if (language == null || language.isEmpty()) {
+            language = "English";
+            session.setAttribute("language", language);
+        }
+
         model.addAttribute("sentences", sentences);
         model.addAttribute("userEmail", email);
         model.addAttribute("theme", session.getAttribute("theme"));
+        model.addAttribute("language", language);   // 👈 add this
         return "saved-sentences";
     }
 
@@ -246,6 +284,7 @@ public class HomeController {
     }
 
     // ------------------ SAVED VOCAB ------------------
+// ------------------ SAVED VOCAB ------------------
     @GetMapping("/saved-vocab")
     public String savedVocabPage(HttpSession session, Model model) {
         String email = (String) session.getAttribute("userEmail");
@@ -256,9 +295,17 @@ public class HomeController {
                 .map(Vocab::getEntry)
                 .toList();
 
+        // 🔹 Get current selected language from session
+        String language = (String) session.getAttribute("language");
+        if (language == null || language.isEmpty()) {
+            language = "English";
+            session.setAttribute("language", language);
+        }
+
         model.addAttribute("vocab", vocab);
         model.addAttribute("userEmail", email);
         model.addAttribute("theme", session.getAttribute("theme"));
+        model.addAttribute("language", language);   // 👈 add this
         return "saved-vocab";
     }
 
